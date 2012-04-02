@@ -1,0 +1,1 @@
+(ns lein-caribou.core)
