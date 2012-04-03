@@ -9,7 +9,7 @@
   `(let [x# ~x] (println "debug:" '~x " -> " x#) x#))
 
 (declare ^:dynamic *project* ^:dynamic *project-dir* ^:dynamic *dirs*)
-(def dir-keys [:controllers :migrations :templates])
+(def dir-keys [:src :controllers :migrations :templates])
 
 (defn clean-proj-name [n]
   (string/replace n #"-" "_"))
@@ -18,11 +18,14 @@
   ;(slurp-resource n)
   (slurp n))
 
+(defn substitute-strings [tmpl]
+  (-> tmpl
+    (string/replace #"\$project\$" *project*)
+    (string/replace #"\$project-dir\$" *project-dir*)
+    (string/replace #"\$safeproject\$" (clean-proj-name *project*))))
+
 (defn get-template [n]
-  (let [tmpl (get-file (str "resources/templates/" n))]
-    (-> tmpl
-      (string/replace #"\$project\$" *project*)
-      (string/replace #"\$safeproject\$" (clean-proj-name *project*)))))
+  (substitute-strings (get-file (str "resources/templates/" n))))
 
 (defn get-dir [n]
   (get *dirs* n))
@@ -57,11 +60,13 @@
   (->file [] ".gitignore" (get-template "gitignore"))
   (->file [] "caribou.keystore" (get-template "caribou.keystore"))
   (->file [] "project.clj" (get-template "project.clj"))
+  (->file (get-dir :src) "core.clj" (get-template "core.clj"))
   (copy-dir "caribou")
   (copy-dir "config")
   (copy-dir "nginx")
   (copy-dir "public")
-  (copy-dir "resources"))
+  (copy-dir "resources")
+  (->file ["nginx"] "nginx.conf" (get-template "nginx.conf")))
  
 (defn create [project-name]
   (println project-name "created!")
