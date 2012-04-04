@@ -2,7 +2,8 @@
 ;;http://webnoir.org/
 
 (ns leiningen.caribou.new
-  (:require [clojure.string :as string])
+  (:require [clojure.string :as string]
+            [caribou.tasks.bootstrap :as bootstrap])
   (:use clojure.java.io))
 
 (defmacro debug [x]
@@ -66,6 +67,7 @@
   (copy-dir "nginx")
   (copy-dir "public")
   (copy-dir "resources")
+  (->file ["config"] "database.yml" (get-template "database.yml"))
   (->file ["nginx"] "nginx.conf" (get-template "nginx.conf")))
  
 (defn create [project-name]
@@ -84,4 +86,8 @@
       (create-dirs)
       (println "Directories Created")
       (populate-dirs)
-      (println "Files Created"))))
+      (println "Files Created")
+      (println "Running bootstrap")
+      (bootstrap/bootstrap clean-name)
+      (bootstrap/bootstrap (str clean-name "_dev"))
+      (bootstrap/bootstrap (str clean-name "_test")))))

@@ -2,21 +2,21 @@ production:
     classname:    org.postgresql.Driver
     subprotocol:  postgresql
     host:         localhost
-    database:     $project$
+    database:     postgres
     user:         postgres
 
 development:
     classname:    org.postgresql.Driver
     subprotocol:  postgresql
-    host:         10.0.1.241
-    database:     $project$_dev
+    host:         localhost
+    database:     postgres
     user:         postgres
 
 test:
     classname:    org.postgresql.Driver
     subprotocol:  postgresql
     host:         localhost
-    database:     $project$_test
+    database:     postgres
     user:         postgres
 
 
