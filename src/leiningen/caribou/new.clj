@@ -90,4 +90,5 @@
       (println "Running bootstrap")
       (bootstrap/bootstrap clean-name)
       (bootstrap/bootstrap (str clean-name "_dev"))
-      (bootstrap/bootstrap (str clean-name "_test")))))
+      (bootstrap/bootstrap (str clean-name "_test"))
+      (println "Congratulations! Your project has been provisioned."))))

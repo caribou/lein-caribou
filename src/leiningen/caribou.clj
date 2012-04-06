@@ -9,6 +9,9 @@
     (println "No project name given")
     (nnew/create project-name)))
 
-(defn test-me []
-  (println "added another line")
-  (println "this is my test biotch what?"))
+(defn caribou
+  "Creates new caribou projects"
+  {:subtasks [#'create]}
+  ([subtask & args]
+   (case subtask
+     "create" (apply leiningen.caribou/create args))))
