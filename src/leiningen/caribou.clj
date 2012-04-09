@@ -9,7 +9,7 @@
     (println "No project name given")
     (nnew/create project-name)))
 
-(defn caribou
+(defn ^{:no-project-needed true} caribou
   "Creates new caribou projects"
   {:subtasks [#'create]}
   ([subtask & args]
