@@ -2,7 +2,7 @@
 ;;http://webnoir.org/
 
 (ns leiningen.caribou
-  (:require [leiningen.caribou.new :as nnew]))
+  (:require [lein_caribou.new :as nnew]))
 
 (defn create [& [project-name]]
   (if-not project-name
@@ -14,4 +14,4 @@
   {:subtasks [#'create]}
   ([subtask & args]
    (case subtask
-     "create" (apply leiningen.caribou/create args))))
+     "create" (apply create args))))

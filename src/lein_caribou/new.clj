@@ -1,7 +1,7 @@
 ;;Based of implementation from the noir framework
 ;;http://webnoir.org/
 
-(ns leiningen.caribou.new
+(ns lein_caribou.new
   (:require [clojure.string :as string]
             [caribou.tasks.bootstrap :as bootstrap])
   (:use clojure.java.io))
@@ -9,7 +9,7 @@
 (defmacro debug [x]
   `(let [x# ~x] (println "debug:" '~x " -> " x#) x#))
 
-(declare ^:dynamic *project* ^:dynamic *project-dir* ^:dynamic *dirs*)
+(declare ^:dynamic *project* ^:dynamic *project-dir* ^:dynamic *dirs* ^:dynamic *home-dir*)
 (def dir-keys [:src :controllers :migrations :templates])
 
 (defn clean-proj-name [n]
@@ -35,6 +35,8 @@
   (.mkdirs (apply file *project-dir* args)))
 
 (defn create-dirs[]
+  (if (not= true (.isDirectory (file *home-dir*)))
+  (.mkdirs (file *home-dir*)))
   (doseq [k dir-keys]
     (mkdir (get-dir k))))
 
@@ -73,7 +75,10 @@
 (defn create [project-name]
   (println project-name "created!")
   (let [clean-name (clean-proj-name project-name)]
-    (binding [*project* project-name
+    (binding [*home-dir* (-> (System/getProperty "user.home")
+                           (file ".caribou")
+                           (.getAbsolutePath))
+              *project* project-name
               *project-dir* (-> (System/getProperty "leiningen.original.pwd")
                               (file project-name)
                               (.getAbsolutePath))
