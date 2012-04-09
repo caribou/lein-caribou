@@ -34,9 +34,13 @@
 (defn mkdir [args]
   (.mkdirs (apply file *project-dir* args)))
 
+(defn create-config []
+  (.mkdirs (file *home-dir* "config"))
+  (spit (apply file *home-dir* ["config" "database.yml"]) (get-template "database_caribou.yml")))
+
 (defn create-dirs[]
   (if (not= true (.isDirectory (file *home-dir*)))
-  (.mkdirs (file *home-dir*)))
+    (create-config))
   (doseq [k dir-keys]
     (mkdir (get-dir k))))
 
