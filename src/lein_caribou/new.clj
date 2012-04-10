@@ -14,7 +14,7 @@
   (string/replace n #"-" "_"))
 
 (defn get-file [n]
-  (slurp (util/pull-resource n)))
+  (slurp (resource n)))
 
 (defn substitute-strings [tmpl]
   (-> tmpl
@@ -51,7 +51,7 @@
     after))
 
 (defn copy-dir [dir-path]
-  (FileUtils/copyDirectory (file (resource dir-path)) (file *project-dir* dir-path) true))
+  (FileUtils/copyDirectory (resource dir-path) (file *project-dir* dir-path) true))
 
 (defn populate-dirs []
   (->file [] "README" (get-template "README"))
@@ -59,7 +59,6 @@
   (->file [] "caribou.keystore" (get-template "caribou.keystore"))
   (->file [] "project.clj" (get-template "project.clj"))
   (->file (get-dir :src) "core.clj" (get-template "core.clj"))
-  ;; (copy-dir "caribou")
   (copy-dir "config")
   (copy-dir "nginx")
   (copy-dir "public")
