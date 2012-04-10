@@ -14,7 +14,7 @@
   (string/replace n #"-" "_"))
 
 (defn get-file [n]
-  (slurp (resource n)))
+  (slurp (resource (util/pathify n))))
 
 (defn substitute-strings [tmpl]
   (-> tmpl
@@ -23,7 +23,7 @@
     (string/replace #"\$safeproject\$" (clean-proj-name *project*))))
 
 (defn get-template [n]
-  (substitute-strings (get-file (util/pathify ["templates" n]))))
+  (substitute-strings (get-file ["templates" n])))
 
 (defn get-dir [n]
   (get *dirs* n))
@@ -53,17 +53,25 @@
 (defn copy-dir [dir-path]
   (FileUtils/copyDirectory (resource dir-path) (file *project-dir* dir-path) true))
 
+(defn copy-resource
+  [path r]
+  (->file path r (get-file (concat path [r]))))
+
 (defn populate-dirs []
   (->file [] "README" (get-template "README"))
   (->file [] ".gitignore" (get-template "gitignore"))
   (->file [] "caribou.keystore" (get-template "caribou.keystore"))
   (->file [] "project.clj" (get-template "project.clj"))
   (->file (get-dir :src) "core.clj" (get-template "core.clj"))
-  (copy-dir "config")
-  (copy-dir "nginx")
-  (copy-dir "public")
   (->file ["config"] "database.yml" (get-template "database.yml"))
-  (->file ["resources"] "caribou.properties" (get-file (util/pathify ["resources" "caribou.properties"])))
+  (copy-resource ["config"] "type-specs.json")
+  (copy-resource ["public" "cors"] "index.html")
+  (copy-resource ["public"] "easyXDM.min.js")
+  (copy-resource ["public"] "easyxdm.swf")
+  (copy-resource ["public"] "json2.js")
+  (copy-resource ["public"] "name.html")
+  (copy-resource ["public"] "upload_rpc.html")
+  (copy-resource ["resources"] "caribou.properties")
   (->file ["nginx"] "nginx.conf" (get-template "nginx.conf")))
  
 (defn create [project-name]
@@ -80,6 +88,9 @@
                       :controllers ["app" "controllers"]
                       :migrations ["app" "migrations"]
                       :templates ["app" "templates"]
+                      :config ["config"]
+                      :cors ["public" "cors"]
+                      :nginx ["nginx"]
                       :resources ["resources"]}]
       (println "Creating caribou project:" *project*)
       (println "Creating new directories at: " *project-dir*)
