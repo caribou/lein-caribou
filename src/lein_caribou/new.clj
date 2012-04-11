@@ -4,7 +4,12 @@
 (ns lein-caribou.new
   (:require [clojure.string :as string]
             [caribou.util :as util]
-            [caribou.tasks.bootstrap :as bootstrap])
+            [caribou.tasks.bootstrap :as bootstrap]
+            [caribou.model :as model]
+            [caribou.db :as db]
+            [caribou.app.config :as config]
+            [clojure.java.jdbc :as sql])
+
   (:import [org.apache.commons.io FileUtils])
   (:use clojure.java.io))
 
@@ -57,6 +62,10 @@
   [path r]
   (->file path r (get-file (concat path [r]))))
 
+(defn create-default []
+  (model/invoke-models)
+  (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
+
 (defn populate-dirs []
   (->file [] "README" (get-template "README"))
   (->file [] ".gitignore" (get-template "gitignore"))
@@ -72,11 +81,14 @@
   (copy-resource ["public"] "name.html")
   (copy-resource ["public"] "upload_rpc.html")
   (copy-resource ["resources"] "caribou.properties")
+  (->file (get-dir :controllers) "home_controller.clj" (get-template "home_controller.clj"))
+  (->file (get-dir :templates) "home.ftl" (get-template "home.ftl"))
   (->file ["nginx"] "nginx.conf" (get-template "nginx.conf")))
  
 (defn create [project-name]
   (println project-name "created!")
-  (let [clean-name (clean-proj-name project-name)]
+  (let [clean-name (clean-proj-name project-name)
+        db-config (config/assoc-subname (dissoc (assoc (config/all-db :development) :database (str clean-name "_dev")) :subname))]
     (binding [*home-dir* (-> (System/getProperty "user.home")
                            (file ".caribou")
                            (.getAbsolutePath))
@@ -102,4 +114,6 @@
       (bootstrap/bootstrap clean-name)
       (bootstrap/bootstrap (str clean-name "_dev"))
       (bootstrap/bootstrap (str clean-name "_test"))
+      (println (str db-config))
+      (sql/with-connection db-config (create-default))
       (println "Congratulations! Your project has been provisioned."))))
