@@ -66,6 +66,27 @@
   (model/invoke-models)
   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
 
+(defn copy-bootstrap [] 
+  (copy-resource ["public" "js"] "application.js")
+  (copy-resource ["public" "js"] "bootstrap-alert.js")
+  (copy-resource ["public" "js"] "bootstrap-button.js")
+  (copy-resource ["public" "js"] "bootstrap-carousel.js")
+  (copy-resource ["public" "js"] "bootstrap-collapse.js")
+  (copy-resource ["public" "js"] "bootstrap-dropdown.js")
+  (copy-resource ["public" "js"] "bootstrap-modal.js")
+  (copy-resource ["public" "js"] "bootstrap-popover.js")
+  (copy-resource ["public" "js"] "bootstrap-scrollspy.js")
+  (copy-resource ["public" "js"] "bootstrap-tab.js")
+  (copy-resource ["public" "js"] "bootstrap-tooltip.js")
+  (copy-resource ["public" "js"] "bootstrap-transition.js")
+  (copy-resource ["public" "js"] "bootstrap-typeahead.js")
+  (copy-resource ["public" "js"] "jquery.js")
+  (copy-resource ["public" "css"] "bootstrap.css")
+  (copy-resource ["public" "css"] "bootstrap-responsive.css")
+  (copy-resource ["public" "ico"] "apple-touch-icon-114-precomposed.png")
+  (copy-resource ["public" "ico"] "apple-touch-icon-57-precomposed.png")
+  (copy-resource ["public" "ico"] "apple-touch-icon-72-precomposed.png"))
+
 (defn populate-dirs []
   (->file [] "README" (get-template "README"))
   (->file [] ".gitignore" (get-template "gitignore"))
@@ -81,6 +102,7 @@
   (copy-resource ["public"] "name.html")
   (copy-resource ["public"] "upload_rpc.html")
   (copy-resource ["resources"] "caribou.properties")
+  (copy-bootstrap)
   (->file (get-dir :controllers) "home_controller.clj" (get-template "home_controller.clj"))
   (->file (get-dir :templates) "home.ftl" (get-template "home.ftl"))
   (->file ["nginx"] "nginx.conf" (get-template "nginx.conf")))
@@ -102,6 +124,10 @@
                       :templates ["app" "templates"]
                       :config ["config"]
                       :cors ["public" "cors"]
+                      :img ["public" "img"]
+                      :ico ["public" "ico"]
+                      :js ["public" "js"]
+                      :css ["public" "css"]
                       :nginx ["nginx"]
                       :resources ["resources"]}]
       (println "Creating caribou project:" *project*)

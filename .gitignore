@@ -2,6 +2,7 @@ pom.xml
 *jar
 /lib/
 /classes/
+/phong-ho/
 .lein-failures
 .lein-deps-sum
 .classpath
