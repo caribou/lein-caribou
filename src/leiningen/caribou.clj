@@ -9,6 +9,9 @@
     (println "No project name given")
     (nnew/create project-name)))
 
+(defn extract-zip []
+  (nnew/unzip))
+
 (defn ^{:no-project-needed true} caribou
   "Creates new caribou projects"
   ([& args]

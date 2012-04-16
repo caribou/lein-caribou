@@ -7,7 +7,7 @@
             [caribou.tasks.bootstrap :as bootstrap]
             [caribou.model :as model]
             [caribou.db :as db]
-            [caribou.app.config :as config]
+            [caribou.config :as config]
             [clojure.java.jdbc :as sql])
 
   (:import [org.apache.commons.io FileUtils])
@@ -21,30 +21,28 @@
 (defn get-file [n]
   (slurp (resource (util/pathify n))))
 
+(def substitution-map
+     [[#"\$project\$" *project*]
+      [#"\$project-dir\$" *project-dir*]
+      [#"\$safeproject\$" (clean-proj-name *project*)]])
+
+(defn sub-strings [tmpl]
+  (reduce 
+    (fn [t pair] (string/replace t (first pair) (last pair))) tmpl substitution-map))
+
 (defn substitute-strings [tmpl]
   (-> tmpl
     (string/replace #"\$project\$" *project*)
     (string/replace #"\$project-dir\$" *project-dir*)
     (string/replace #"\$safeproject\$" (clean-proj-name *project*))))
 
-(defn get-template [n]
-  (substitute-strings (get-file ["templates" n])))
-
-(defn get-dir [n]
-  (get *dirs* n))
-
 (defn mkdir [args]
-  (.mkdirs (apply file *project-dir* args)))
+  (println args)
+  (.mkdirs (apply file args)))
 
 (defn create-config []
   (.mkdirs (file *home-dir* "config"))
   (spit (apply file *home-dir* ["config" "database.yml"]) (get-template "database_caribou.yml")))
-
-(defn create-dirs []
-  (if (not= true (.isDirectory (file *home-dir*)))
-    (create-config))
-  (doseq [dir (vals *dirs*)]
-    (mkdir dir)))
 
 (defn ->file [path file-name content]
   (let [target (util/pathify (concat [*project-dir*] path [file-name]))]
@@ -66,26 +64,20 @@
   (model/invoke-models)
   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
 
-(defn copy-bootstrap [] 
-  (copy-resource ["public" "js"] "application.js")
-  (copy-resource ["public" "js"] "bootstrap-alert.js")
-  (copy-resource ["public" "js"] "bootstrap-button.js")
-  (copy-resource ["public" "js"] "bootstrap-carousel.js")
-  (copy-resource ["public" "js"] "bootstrap-collapse.js")
-  (copy-resource ["public" "js"] "bootstrap-dropdown.js")
-  (copy-resource ["public" "js"] "bootstrap-modal.js")
-  (copy-resource ["public" "js"] "bootstrap-popover.js")
-  (copy-resource ["public" "js"] "bootstrap-scrollspy.js")
-  (copy-resource ["public" "js"] "bootstrap-tab.js")
-  (copy-resource ["public" "js"] "bootstrap-tooltip.js")
-  (copy-resource ["public" "js"] "bootstrap-transition.js")
-  (copy-resource ["public" "js"] "bootstrap-typeahead.js")
-  (copy-resource ["public" "js"] "jquery.js")
-  (copy-resource ["public" "css"] "bootstrap.css")
-  (copy-resource ["public" "css"] "bootstrap-responsive.css")
-  (copy-resource ["public" "ico"] "apple-touch-icon-114-precomposed.png")
-  (copy-resource ["public" "ico"] "apple-touch-icon-57-precomposed.png")
-  (copy-resource ["public" "ico"] "apple-touch-icon-72-precomposed.png"))
+(defn copy-zip [zip-file destination]
+  (println zip-file)
+  (println destination)
+  (fn [entry]
+    (let [file-name (.getName entry)
+          content (slurp (.getInputStream zip-file entry))]
+      (println file-name)
+      (if (.isDirectory entry)
+        (mkdir [destination file-name])
+        (spit (file (util/pathify [destination file-name])) (substitute-strings content))))))
+
+(defn unzip [zip-file destination]
+  (let [z (java.util.zip.ZipFile. (file (resource zip-file)))] 
+    (doall (map (copy-zip z destination) (enumeration-seq (.entries z))))))
 
 (defn populate-dirs []
   (->file [] "README" (get-template "README"))
@@ -106,7 +98,8 @@
   (->file (get-dir :controllers) "home_controller.clj" (get-template "home_controller.clj"))
   (->file (get-dir :templates) "home.ftl" (get-template "home.ftl"))
   (->file ["nginx"] "nginx.conf" (get-template "nginx.conf")))
- 
+
+
 (defn create [project-name]
   (println project-name "created!")
   (let [clean-name (clean-proj-name project-name)
@@ -117,25 +110,13 @@
               *project* project-name
               *project-dir* (-> (System/getProperty "leiningen.original.pwd")
                               (file project-name)
-                              (.getAbsolutePath))
-              *dirs* {:src ["src" clean-name]
-                      :controllers ["app" "controllers"]
-                      :migrations ["app" "migrations"]
-                      :templates ["app" "templates"]
-                      :config ["config"]
-                      :cors ["public" "cors"]
-                      :img ["public" "img"]
-                      :ico ["public" "ico"]
-                      :js ["public" "js"]
-                      :css ["public" "css"]
-                      :nginx ["nginx"]
-                      :resources ["resources"]}]
+                              (.getAbsolutePath))]
       (println "Creating caribou project:" *project*)
-      (println "Creating new directories at: " *project-dir*)
-      (create-dirs)
-      (println "Directories Created")
-      (populate-dirs)
-      (println "Files Created")
+      (if (not= true (.isDirectory (file *home-dir*)))
+        (create-config))
+      (println "Copying files to: " *project-dir*)
+      (unzip "resource_package.zip" *project-dir*)
+      (println "Done...")
       (println "Running bootstrap")
       (bootstrap/bootstrap clean-name)
       (bootstrap/bootstrap (str clean-name "_dev"))
