@@ -36,6 +36,9 @@
     (string/replace #"\$project-dir\$" *project-dir*)
     (string/replace #"\$safeproject\$" (clean-proj-name *project*))))
 
+(defn get-template [n]
+  (substitute-strings (get-file ["templates" n])))
+
 (defn mkdir [args]
   (println args)
   (.mkdirs (apply file args)))
@@ -56,13 +59,15 @@
 (defn copy-dir [dir-path]
   (FileUtils/copyDirectory (resource dir-path) (file *project-dir* dir-path) true))
 
-(defn copy-resource
-  [path r]
-  (->file path r (get-file (concat path [r]))))
-
 (defn create-default []
   (model/invoke-models)
   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
+
+(defn load-resource
+  [resource-name]
+  (let [thr (Thread/currentThread)
+        ldr (.getContextClassLoader thr)]
+    (.getResourceAsStream ldr resource-name)))
 
 (defn copy-zip [zip-file destination]
   (println zip-file)
@@ -76,29 +81,8 @@
         (spit (file (util/pathify [destination file-name])) (substitute-strings content))))))
 
 (defn unzip [zip-file destination]
-  (let [z (java.util.zip.ZipFile. (file (resource zip-file)))] 
+  (let [z (java.util.zip.ZipFile. (ClassLoader/getSystemResource zip-file))] 
     (doall (map (copy-zip z destination) (enumeration-seq (.entries z))))))
-
-(defn populate-dirs []
-  (->file [] "README" (get-template "README"))
-  (->file [] ".gitignore" (get-template "gitignore"))
-  (->file [] "caribou.keystore" (get-template "caribou.keystore"))
-  (->file [] "project.clj" (get-template "project.clj"))
-  (->file (get-dir :src) "core.clj" (get-template "core.clj"))
-  (->file ["config"] "database.yml" (get-template "database.yml"))
-  (copy-resource ["config"] "type-specs.json")
-  (copy-resource ["public" "cors"] "index.html")
-  (copy-resource ["public"] "easyXDM.min.js")
-  (copy-resource ["public"] "easyxdm.swf")
-  (copy-resource ["public"] "json2.js")
-  (copy-resource ["public"] "name.html")
-  (copy-resource ["public"] "upload_rpc.html")
-  (copy-resource ["resources"] "caribou.properties")
-  (copy-bootstrap)
-  (->file (get-dir :controllers) "home_controller.clj" (get-template "home_controller.clj"))
-  (->file (get-dir :templates) "home.ftl" (get-template "home.ftl"))
-  (->file ["nginx"] "nginx.conf" (get-template "nginx.conf")))
-
 
 (defn create [project-name]
   (println project-name "created!")
