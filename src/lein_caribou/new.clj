@@ -81,7 +81,8 @@
         (spit (file (util/pathify [destination file-name])) (substitute-strings content))))))
 
 (defn unzip [zip-file destination]
-  (let [z (java.util.zip.ZipFile. (ClassLoader/getSystemResource zip-file))] 
+  (println (.getFile (resource zip-file)))
+  (let [z (java.util.zip.ZipFile. (.getFile (resource zip-file)))] 
     (doall (map (copy-zip z destination) (enumeration-seq (.entries z))))))
 
 (defn create [project-name]
@@ -102,9 +103,9 @@
       (unzip "resource_package.zip" *project-dir*)
       (println "Done...")
       (println "Running bootstrap")
-      (bootstrap/bootstrap clean-name)
-      (bootstrap/bootstrap (str clean-name "_dev"))
-      (bootstrap/bootstrap (str clean-name "_test"))
+      ;(bootstrap/bootstrap clean-name)
+      ;(bootstrap/bootstrap (str clean-name "_dev"))
+      ;(bootstrap/bootstrap (str clean-name "_test"))
       (println (str db-config))
-      (sql/with-connection db-config (create-default))
+      ;(sql/with-connection db-config (create-default))
       (println "Congratulations! Your project has been provisioned."))))
