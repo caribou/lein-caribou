@@ -10,7 +10,11 @@
             [caribou.config :as config]
             [clojure.java.jdbc :as sql])
 
-  (:import [org.apache.commons.io FileUtils])
+  (:import [org.apache.commons.io FileUtils]
+           [java.util.zip ZipInputStream]
+           [java.io File]
+           [java.io BufferedOutputStream]
+           [java.io FileOutputStream])
   (:use clojure.java.io))
 
 (declare ^:dynamic *project* ^:dynamic *project-dir* ^:dynamic *dirs* ^:dynamic *home-dir*)
@@ -19,7 +23,7 @@
   (string/replace n #"-" "_"))
 
 (defn get-file [n]
-  (slurp (resource (util/pathify n))))
+  (slurp (util/pathify n)))
 
 (def substitution-map
      [[#"\$project\$" *project*]
@@ -98,10 +102,42 @@
         (mkdir [destination file-name])
         (spit (file (util/pathify [destination file-name])) (substitute-strings content))))))
 
+;; (defn unzip [zip-file destination]
+;;   ;;(let [z (java.util.zip.ZipFile. (.getFile (resource zip-file)))] 
+;;   (let [z (java.util.zip.ZipFile. (mkzip zip-file destination))] 
+;;     (doall (map (copy-zip z destination) (enumeration-seq (.entries z))))))
+
 (defn unzip [zip-file destination]
-  ;;(let [z (java.util.zip.ZipFile. (.getFile (resource zip-file)))] 
-  (let [z (java.util.zip.ZipFile. (mkzip zip-file destination))] 
-    (doall (map (copy-zip z destination) (enumeration-seq (.entries z))))))
+  (let [zip-stream (ZipInputStream. (clojure.java.io/input-stream (resource zip-file)))]
+    ;; iterate over each entry in the zip
+    (loop [entry (.getNextEntry zip-stream)]
+      (if (not (= nil entry))
+        (do (let [out-file (File. (str destination "/" (.getName entry)))]
+              ;; blow out directory structure
+              (loop [parent-file (.getParentFile out-file)]
+                (if (not (= nil parent-file))
+                  (do (.mkdirs parent-file)
+                      (recur (.getParentFile parent-file)))))
+              ;; write dem files
+              (if (not (.isDirectory entry))
+                (let [out (BufferedOutputStream. (FileOutputStream. out-file) 1024)
+                      data (byte-array 1024)]
+                  (loop [len (.read zip-stream data 0 1024)]
+                    (if (not (= -1 len))
+                      (do (.write out data 0 len)
+                          (recur (.read zip-stream data 0 1024)))))
+                    (.flush out)
+                    (.close out))))   
+          (recur (.getNextEntry zip-stream)))))
+    (.close zip-stream)))
+
+(defn tailor-proj []
+  (let [files (file-seq (file *project-dir*))]
+    (doseq [f files]
+        (if (.isFile f)
+          (let [content (slurp (str f))]
+          (println (str f))
+          (spit (file (util/pathify [(str f)])) (substitute-strings content)))))))
   
 (defn create [project-name]
   (println project-name "created!")
@@ -120,11 +156,12 @@
       (.mkdirs (file *project-dir*))
       (println "Copying files to: " *project-dir*)
       (unzip "resource_package.zip" *project-dir*)
+      (tailor-proj)
       (println "Done...")
       (println "Running bootstrap")
-      ;(bootstrap/bootstrap clean-name)
-      ;(bootstrap/bootstrap (str clean-name "_dev"))
-      ;(bootstrap/bootstrap (str clean-name "_test"))
+      (bootstrap/bootstrap clean-name)
+      (bootstrap/bootstrap (str clean-name "_dev"))
+      (bootstrap/bootstrap (str clean-name "_test"))
       (println (str db-config))
-      ;(sql/with-connection db-config (create-default))
+      (sql/with-connection db-config (create-default))
       (println "Congratulations! Your project has been provisioned."))))
