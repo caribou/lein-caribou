@@ -69,6 +69,24 @@
         ldr (.getContextClassLoader thr)]
     (.getResourceAsStream ldr resource-name)))
 
+(defn mkzip [zip-file destination]
+  (println zip-file)
+  (println destination)
+    
+  (let [z (input-stream (resource zip-file))
+        f (file (str destination "/" zip-file))
+        out (java.io.FileOutputStream. f)
+        ;;out (java.util.zip.ZipOutputStream. (java.io.FileOutputStream. f))
+        ;;out (load-resource "resources/resource_package.zip")
+         bytez (byte-array 1024)] 
+      (loop [len (.read z bytez 0 1024)]
+         (if (not (= -1 len))
+             (do (.write out bytez 0 1024) 
+                 (recur (.read z bytez 0 1024)))))
+         (.close out)
+         (file f)
+   ))
+
 (defn copy-zip [zip-file destination]
   (println zip-file)
   (println destination)
@@ -81,10 +99,10 @@
         (spit (file (util/pathify [destination file-name])) (substitute-strings content))))))
 
 (defn unzip [zip-file destination]
-  (println (.getFile (resource zip-file)))
-  (let [z (java.util.zip.ZipFile. (.getFile (resource zip-file)))] 
+  ;;(let [z (java.util.zip.ZipFile. (.getFile (resource zip-file)))] 
+  (let [z (java.util.zip.ZipFile. (mkzip zip-file destination))] 
     (doall (map (copy-zip z destination) (enumeration-seq (.entries z))))))
-
+  
 (defn create [project-name]
   (println project-name "created!")
   (let [clean-name (clean-proj-name project-name)
@@ -99,6 +117,7 @@
       (println "Creating caribou project:" *project*)
       (if (not= true (.isDirectory (file *home-dir*)))
         (create-config))
+      (.mkdirs (file *project-dir*))
       (println "Copying files to: " *project-dir*)
       (unzip "resource_package.zip" *project-dir*)
       (println "Done...")
