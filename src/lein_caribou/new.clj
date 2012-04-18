@@ -1,5 +1,4 @@
-;;Based of implementation from the noir framework
-;;http://webnoir.org/
+;;Provision new caribou project and bootstrap it.
 
 (ns lein-caribou.new
   (:require [clojure.string :as string]
@@ -41,7 +40,7 @@
     (string/replace #"\$safeproject\$" (clean-proj-name *project*))))
 
 (defn get-template [n]
-  (substitute-strings (get-file ["templates" n])))
+  (substitute-strings (get-file [(resource n)])))
 
 (defn mkdir [args]
   (println args)
@@ -51,61 +50,9 @@
   (.mkdirs (file *home-dir* "config"))
   (spit (apply file *home-dir* ["config" "database.yml"]) (get-template "database_caribou.yml")))
 
-(defn ->file [path file-name content]
-  (let [target (util/pathify (concat [*project-dir*] path [file-name]))]
-    (spit (file target) content)))
-
-(defn re-replace-beginning
-  [r s]
-  (let [[_ after] (re-find r s)]
-    after))
-
-(defn copy-dir [dir-path]
-  (FileUtils/copyDirectory (resource dir-path) (file *project-dir* dir-path) true))
-
 (defn create-default []
   (model/invoke-models)
   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
-
-(defn load-resource
-  [resource-name]
-  (let [thr (Thread/currentThread)
-        ldr (.getContextClassLoader thr)]
-    (.getResourceAsStream ldr resource-name)))
-
-(defn mkzip [zip-file destination]
-  (println zip-file)
-  (println destination)
-    
-  (let [z (input-stream (resource zip-file))
-        f (file (str destination "/" zip-file))
-        out (java.io.FileOutputStream. f)
-        ;;out (java.util.zip.ZipOutputStream. (java.io.FileOutputStream. f))
-        ;;out (load-resource "resources/resource_package.zip")
-         bytez (byte-array 1024)] 
-      (loop [len (.read z bytez 0 1024)]
-         (if (not (= -1 len))
-             (do (.write out bytez 0 1024) 
-                 (recur (.read z bytez 0 1024)))))
-         (.close out)
-         (file f)
-   ))
-
-(defn copy-zip [zip-file destination]
-  (println zip-file)
-  (println destination)
-  (fn [entry]
-    (let [file-name (.getName entry)
-          content (slurp (.getInputStream zip-file entry))]
-      (println file-name)
-      (if (.isDirectory entry)
-        (mkdir [destination file-name])
-        (spit (file (util/pathify [destination file-name])) (substitute-strings content))))))
-
-;; (defn unzip [zip-file destination]
-;;   ;;(let [z (java.util.zip.ZipFile. (.getFile (resource zip-file)))] 
-;;   (let [z (java.util.zip.ZipFile. (mkzip zip-file destination))] 
-;;     (doall (map (copy-zip z destination) (enumeration-seq (.entries z))))))
 
 (defn unzip [zip-file destination]
   (let [zip-stream (ZipInputStream. (clojure.java.io/input-stream (resource zip-file)))]
