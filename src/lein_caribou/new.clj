@@ -85,6 +85,11 @@
           (let [content (slurp (str f))]
           (println (str f))
           (spit (file (util/pathify [(str f)])) (substitute-strings content)))))))
+
+(defn bootstrap-all [yaml-file]
+  (let [yaml (config/load-yaml yaml-file)]
+    (doseq [env yaml]
+      (bootstrap/bootstrap (get (second env) :database)))))
   
 (defn create [project-name]
   (println project-name "created!")

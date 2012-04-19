@@ -9,8 +9,8 @@
     (println "No project name given")
     (nnew/create project-name)))
 
-(defn extract-zip []
-  (nnew/unzip))
+(defn bootstrap-all [& [yaml-file]]
+  (nnew/bootstrap-all yaml-file))
 
 (defn ^{:no-project-needed true} caribou
   "Creates new caribou projects"
@@ -18,4 +18,5 @@
      (let [args (rest args)]
        (cond
         (= "create" (first args)) (apply create (rest args))
+        (= "bootstrap-all" (first args)) (apply bootstrap-all (rest args))
         :else (println "No command by that name")))))
