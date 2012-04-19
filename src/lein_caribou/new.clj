@@ -24,20 +24,14 @@
 (defn get-file [n]
   (slurp (util/pathify n)))
 
-(def substitution-map
+(defn substitution-map []
      [[#"\$project\$" *project*]
       [#"\$project-dir\$" *project-dir*]
       [#"\$safeproject\$" (clean-proj-name *project*)]])
 
 (defn sub-strings [tmpl]
   (reduce 
-    (fn [t pair] (string/replace t (first pair) (last pair))) tmpl substitution-map))
-
-(defn substitute-strings [tmpl]
-  (-> tmpl
-    (string/replace #"\$project\$" *project*)
-    (string/replace #"\$project-dir\$" *project-dir*)
-    (string/replace #"\$safeproject\$" (clean-proj-name *project*))))
+    (fn [t pair] (string/replace t (first pair) (last pair))) tmpl (substitution-map)))
 
 (defn get-template [n]
   (substitute-strings (get-file [(resource n)])))
@@ -84,7 +78,7 @@
         (if (.isFile f)
           (let [content (slurp (str f))]
           (println (str f))
-          (spit (file (util/pathify [(str f)])) (substitute-strings content)))))))
+          (spit (file (util/pathify [(str f)])) (sub-strings content)))))))
 
 (defn bootstrap-all [yaml-file]
   (let [yaml (config/load-yaml yaml-file)]
@@ -111,9 +105,10 @@
       (tailor-proj)
       (println "Done...")
       (println "Running bootstrap")
-      (bootstrap/bootstrap clean-name)
-      (bootstrap/bootstrap (str clean-name "_dev"))
-      (bootstrap/bootstrap (str clean-name "_test"))
-      (println (str db-config))
-      (sql/with-connection db-config (create-default))
+      ;;(bootstrap/bootstrap clean-name)
+      ;;(bootstrap/bootstrap (str clean-name "_dev"))
+      ;;(bootstrap/bootstrap (str clean-name "_test"))
+      ;;(bootstrap-all "config/database.yml")
+      ;;(println (str db-config))
+      ;;(sql/with-connection db-config (create-default))
       (println "Congratulations! Your project has been provisioned."))))
