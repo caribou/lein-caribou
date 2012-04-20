@@ -73,9 +73,9 @@
                     (if (not (= -1 len))
                       (do (.write out data 0 len)
                           (recur (.read zip-stream data 0 1024)))))
-                    (.flush out)
-                    (.close out))))   
-          (recur (.getNextEntry zip-stream)))))
+                  (.flush out)
+                  (.close out))))   
+            (recur (.getNextEntry zip-stream)))))
     (.close zip-stream)))
 
 (defn tailor-proj []
