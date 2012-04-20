@@ -12,49 +12,68 @@
 
 (declare ^:dynamic *project* ^:dynamic *project-dir* ^:dynamic *dirs* ^:dynamic *home-dir*)
 
-(defn clean-proj-name [n]
+(defn clean-proj-name
+  [n]
   (string/replace n #"-" "_"))
 
-(defn get-file [n]
+(defn get-file
+  [n]
   (slurp (pathify n)))
 
-(defn substitution-map []
-     [[#"\$project\$" *project*]
-      [#"\$project-dir\$" *project-dir*]
-      [#"\$safeproject\$" (clean-proj-name *project*)]])
+(defn substitution-map
+  []
+  [[#"\$project\$" *project*]
+   [#"\$project-dir\$" *project-dir*]
+   [#"\$safeproject\$" (clean-proj-name *project*)]])
 
-(defn substitute-strings [tmpl]
+(defn substitute-strings
+  [tmpl]
   (reduce 
     (fn [t pair] (string/replace t (first pair) (last pair))) tmpl (substitution-map)))
 
-(defn get-template [n]
+(defn get-template
+  [n]
   (substitute-strings (get-file [(resource n)])))
 
-(defn create-config []
+(defn create-config
+  []
   (.mkdirs (file *home-dir* "config"))
   (spit (apply file *home-dir* ["config" "database.yml"]) (get-template "database_caribou.yml")))
 
-(defn create-default []
+(defn find-db-config
+  [project-name]
+  (config/assoc-subname
+   (dissoc
+    (assoc
+      (config/all-db :development)
+      :database (str project-name "_dev"))
+    :subname)))
+
+(defn create-default
+  []
   (model/invoke-models)
   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
 
-(defn tailor-proj []
+(defn tailor-proj
+  []
   (let [files (file-seq (file *project-dir*))]
     (doseq [f files]
         (if (.isFile f)
           (let [content (slurp (str f))]
           (println (str f))
-          (spit (file (pathify [(str f)])) (sub-strings content)))))))
+          (spit (file (pathify [(str f)])) (substitute-strings content)))))))
 
-(defn bootstrap-all [yaml-file]
+(defn bootstrap-all
+  [yaml-file]
   (let [yaml (config/load-yaml yaml-file)]
     (doseq [env yaml]
       (bootstrap/bootstrap (get (second env) :database)))))
   
-(defn create [project-name]
+(defn create
+  [project-name]
   (println project-name "created!")
   (let [clean-name (clean-proj-name project-name)
-        db-config (config/assoc-subname (dissoc (assoc (config/all-db :development) :database (str clean-name "_dev")) :subname))]
+        db-config (find-db-config clean-name)]
     (binding [*home-dir* (-> (System/getProperty "user.home")
                            (file ".caribou")
                            (.getAbsolutePath))
