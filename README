@@ -1,13 +1,26 @@
 # lein-caribou
 
-FIXME: write description
+lein-caribou is a leiningen plugin to create and manage caribou projects.
 
 ## Usage
 
-FIXME: write
+Install lein-caribou alongside lein-ring in your ~/.lein/profiles.clj:
+
+    [lein-ring "0.6.4"]
+    [antler/lein-caribou "1.1.17"]
+
+Then from the command line:
+
+    > lein caribou create projectname
+    > cd projectname/caribou-frontend
+    > lein ring server
+
+Also, if you pull down a caribou project from elsewhere, you can set up all the related databases with the following bootstrap command: 
+
+    > lein caribou bootstrap "projectname/config/database.yml"
 
 ## License
 
-Copyright (C) 2012 FIXME
+Copyright (C) Instrument 2012
 
 Distributed under the Eclipse Public License, the same as Clojure.
