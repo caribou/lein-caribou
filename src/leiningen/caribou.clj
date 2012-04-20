@@ -18,5 +18,5 @@
      (let [args (rest args)]
        (cond
         (= "create" (first args)) (apply create (rest args))
-        (= "bootstrap" (first args)) (apply bootstrap-all (rest args))
+        (= "bootstrap" (first args)) (apply bootstrap (rest args))
         :else (println "No command by that name")))))

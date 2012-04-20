@@ -1,4 +1,4 @@
-(defproject antler/lein-caribou "1.1.17"
+(defproject antler/lein-caribou "1.2.1"
   :description "Caribou Provisioning Tool"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [antler/zippix "0.1.0"]
