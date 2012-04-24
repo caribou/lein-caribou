@@ -1,6 +1,11 @@
-(defproject antler/lein-caribou "1.2.1"
+(defproject antler/lein-caribou "1.2.2"
   :description "Caribou Provisioning Tool"
   :dependencies [[org.clojure/clojure "1.3.0"]
+                 [leiningen-core "2.0.0-SNAPSHOT"]
+                 [ring/ring-core "1.0.2"
+                  :exclusions [org.clojure/clojure
+                               clj-stacktrace]]
+                 [ring/ring-jetty-adapter "1.1.0"]
                  [antler/zippix "0.1.0"]
                  [antler/commons-io "2.2.0"]
                  [antler/caribou-core "0.5.0"]]
