@@ -2,6 +2,8 @@
   (:require [leiningen.core.project :as project]
             [ring.adapter.jetty :as ring]))
 
+(defstruct server-map :server :handler :init :destroy)
+
 (def caribou-servers (ref {}))
 
 (def header-buffer-size 8388608)
@@ -23,15 +25,23 @@
    :keystore "caribou.keystore"
    :key-password "caribou"})
 
+(defn load-var [sym]
+  (when sym
+    (require (-> sym namespace symbol))
+    (find-var sym)))
+
 (defn start-server
   [project]
   (let [config (project :ring)
         ssl-config (if (config :ssl-port) default-ssl-config {})
-        jetty-config (merge default-jetty-config ssl-config)]
+        jetty-config (merge default-jetty-config ssl-config)
+        handler (load-var (-> config :ring :handler))
+        init (load-var (-> config :ring :init))
+        destroy (load-var (-> config :ring :destroy))]
     (init)
-    (ring/run-jetty
-     (var app)
-     (merge jetty-config config))))
+    (let [server (ring/run-jetty handler (merge jetty-config config))
+          server-info (server-map server handler init destroy)]
+      server-info)))
 
 (def server-datum
   [:frontend :api :admin])
@@ -44,9 +54,9 @@
   [project]
   (doseq [server-key server-datum]
     (let [server-project (project/read (server-project-name server-key))
-          server (start-server server-project)]
+          server-info (start-server server-project)]
       (dosync
-       (alter caribou-servers assoc server-key server)))))
+       (alter caribou-servers assoc server-key server-info)))))
 
 (defn stop
   [project]

@@ -2,7 +2,8 @@
 ;;http://webnoir.org/
 
 (ns leiningen.caribou
-  (:use leiningen.caribou.create
+  (:use [leiningen.help :only (help-for subtask-help-for)]
+        leiningen.caribou.create
         leiningen.caribou.bootstrap
         leiningen.caribou.server))
 
@@ -16,9 +17,9 @@
      (println (help-for "caribou")))
   ([project subtask & args]
      (condp = subtask
-        "create" (apply create (rest args))
-        "bootstrap" (apply bootstrap (rest args))
-        "bootstrap-all" (apply bootstrap-all (rest args))
-        "start" (apply start (rest args))
-        "stop" (apply stop (rest args))
+        "create" (apply create args)
+        "bootstrap" (apply bootstrap args)
+        "bootstrap-all" (apply bootstrap-all args)
+        "start" (apply start args)
+        "stop" (apply stop args)
         (println "No command by that name"))))
