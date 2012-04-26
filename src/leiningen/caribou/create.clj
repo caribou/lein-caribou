@@ -5,9 +5,9 @@
             [caribou.model :as model]
             [caribou.db :as db]
             [caribou.config :as config]
+            [caribou.tasks.bootstrap :as bootstrap]
             [clojure.java.jdbc :as sql])
   (:use clojure.java.io
-        leiningen.caribou.bootstrap
         [zippix.core :only (pathify unzip-resource)]))
 
 (declare ^:dynamic *project* ^:dynamic *project-dir* ^:dynamic *dirs* ^:dynamic *home-dir*)
@@ -44,9 +44,7 @@
   [project-name]
   (config/assoc-subname
    (dissoc
-    (assoc
-      (config/all-db :development)
-      :database (str project-name "_dev"))
+    (assoc @config/db :database (str project-name "_development"))
     :subname)))
 
 (defn create-default
@@ -63,11 +61,15 @@
           (println (str f))
           (spit (file (pathify [(str f)])) (substitute-strings content)))))))
 
+(defn read-db-config
+  [config-path]
+  (config/assoc-subname ((config/read-config config-path) :database)))
+
 (defn create
   [project-name]
   (println project-name "created!")
   (let [clean-name (clean-proj-name project-name)
-        db-config (find-db-config clean-name)]
+        config-path (pathify [*project-dir* "config" "development.clj"])]
     (binding [*home-dir* (-> (System/getProperty "user.home")
                            (file ".caribou")
                            (.getAbsolutePath))
@@ -84,6 +86,7 @@
       (tailor-proj)
       (println "Done...")
       (println "Running bootstrap")
-      (bootstrap-all (pathify [*project-dir* "config" "database.yml"]))
-      (sql/with-connection db-config (create-default))
-      (println "Congratulations! Your project has been provisioned."))))
+      (let [db-config (read-db-config config-path)]
+        (bootstrap/bootstrap db-config)
+        (sql/with-connection db-config (create-default))
+        (println "Congratulations! Your project has been provisioned.")))))
