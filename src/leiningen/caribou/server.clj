@@ -13,7 +13,10 @@
 (defn full-head-avoidance
   [jetty]
   (doseq [connector (.getConnectors jetty)]
-    (.setRequestHeaderSize connector header-buffer-size)))
+    (try
+      (.setRequestHeaderSize connector header-buffer-size)
+      (catch Exception e
+        (.setHeaderBufferSize connector header-buffer-size)))))
 
 (def default-jetty-config
   {:port 33003
@@ -74,7 +77,7 @@
           server-info (struct server-map server handler init destroy)]
       server-info)))
   
-(def server-datum
+(def server-list
   [:site :api :admin])
   
 (defn server-project-name
@@ -85,18 +88,26 @@
   [project]
   [[(symbol (project :name)) (project :version)]])
 
+(defn set-join
+  [project join?]
+  (update-in project [:ring :join?] (fn [_] join?)))
+
+(defn prepare-server
+  [project server-key join?]
+  (let [project-name (server-project-name server-key)
+        server-project (set-join (project/read project-name) join?)
+        project-coordinates (coordinates-for server-project)
+        _ (pom/add-classpath (io/file (str (name server-key) "/src")))
+        _ (pom/add-dependencies :coordinates (server-project :dependencies) :repositories {"clojars" "http://clojars.org/repo"})
+        server-info (start-server server-project)]
+    (dosync
+     (alter caribou-servers assoc server-key server-info))))
+
 (defn start
   [project]
-  (println "yoyoyoybo")
-  (doseq [server-key server-datum]
-    (let [project-name (server-project-name server-key)
-          server-project (project/read project-name)
-          project-coordinates (coordinates-for server-project)
-          _ (pom/add-classpath (io/file (str (name server-key) "/src")))
-          _ (pom/add-dependencies :coordinates (server-project :dependencies) :repositories {"clojars" "http://clojars.org/repo"})
-          server-info (start-server server-project)]
-      (dosync
-       (alter caribou-servers assoc server-key server-info)))))
+  (doseq [server-key (butlast server-list)]
+    (prepare-server project server-key false))
+  (prepare-server project (last server-list) true))
 
 (defn stop
   [project]

@@ -66,10 +66,9 @@
   (config/assoc-subname ((config/read-config config-path) :database)))
 
 (defn create
-  [project-name]
+  [_ project-name]
   (println project-name "created!")
-  (let [clean-name (clean-proj-name project-name)
-        config-path (pathify [*project-dir* "config" "development.clj"])]
+  (let [clean-name (clean-proj-name project-name)]
     (binding [*home-dir* (-> (System/getProperty "user.home")
                            (file ".caribou")
                            (.getAbsolutePath))
@@ -86,7 +85,8 @@
       (tailor-proj)
       (println "Done...")
       (println "Running bootstrap")
-      (let [db-config (read-db-config config-path)]
+      (let [config-path (pathify [*project-dir* "config" "development.clj"])
+            db-config (read-db-config config-path)]
         (bootstrap/bootstrap db-config)
         (sql/with-connection db-config (create-default))
         (println "Congratulations! Your project has been provisioned.")))))

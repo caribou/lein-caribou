@@ -3,7 +3,7 @@
             [caribou.tasks.bootstrap :as bootstrap]))
 
 (defn bootstrap
-  [config-file]
+  [_ config-file]
   (let [config (config/read-config config-file)
         database (-> config :database)]
     (bootstrap/bootstrap database)))

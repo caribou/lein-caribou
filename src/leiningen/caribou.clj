@@ -16,9 +16,10 @@
   ([project]
      (println (help-for "caribou")))
   ([project subtask & args]
-     (condp = subtask
-        "create" (apply create args)
-        "bootstrap" (apply bootstrap args)
-        "start" (apply start args)
-        "stop" (apply stop args)
-        (println "No command by that name"))))
+     (let [subtask-args (cons project args)]
+       (condp = subtask
+         "create" (apply create subtask-args)
+         "bootstrap" (apply bootstrap subtask-args)
+         "start" (apply start subtask-args)
+         "stop" (apply stop subtask-args)
+         (println "No command by that name")))))
