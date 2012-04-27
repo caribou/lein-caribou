@@ -104,13 +104,18 @@
      (alter caribou-servers assoc server-key server-info))))
 
 (defn start
-  [project]
-  (doseq [server-key (butlast server-list)]
-    (prepare-server project server-key false))
-  (prepare-server project (last server-list) true))
-
+  ([project] (start project true))
+  ([project join?]
+     (if (empty? @caribou-servers)
+       (do
+         (doseq [server-key (butlast server-list)]
+           (prepare-server project server-key false))
+         (prepare-server project (last server-list) join?))
+       (doseq [server (vals @caribou-servers)]
+         (.start (server :server))))))
+        
 (defn stop
   [project]
-  (doseq [server caribou-servers]
-    (.stop server)))
+  (doseq [server (vals @caribou-servers)]
+    (.stop (server :server))))
 
