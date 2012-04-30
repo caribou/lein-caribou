@@ -4,4 +4,4 @@
             :database     "caribou_development"
             :user         "postgres"
             :password     ""} 
- :controller-ns  "skel.controllers"}
+ :controller-ns  "$project$.controllers"}

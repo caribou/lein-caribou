@@ -5,7 +5,7 @@
             :user         "postgres"
             :password     ""}
  :template-dir   "site/resources/templates" 
- :controller-ns  "skel.controllers"
+ :controller-ns  "$project$.controllers"
  :public-dir     "site/resources/public"
  :api-public     "api/public"
  :asset-dir      "assets"

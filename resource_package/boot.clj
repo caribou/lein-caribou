@@ -16,7 +16,7 @@
               :password     ""}
 
    :template-dir   "site/resources/templates" 
-   :controller-ns  "skel.controllers"
+   :controller-ns  "$project$.controllers"
    :public-dir     "site/resources/public"
    :api-public-dir "api/public"
    :asset-dir      "assets"

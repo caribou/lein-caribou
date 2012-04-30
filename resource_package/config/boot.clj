@@ -18,7 +18,7 @@
    :asset-dir      "app/"
    :hooks-dir      "app/hooks"
    :api-public     "api/resources/public"
-   :controller-ns  "skel.controllers"})
+   :controller-ns  "$project.controllers"})
 
 (defn submerge
   [a b]
