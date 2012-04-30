@@ -53,8 +53,11 @@
   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
 
 (defn tailor-proj
-  []
-  (let [files (file-seq (file *project-dir*))]
+  [dir]
+  (let [old-dir (file (str (file dir) "/site/src/skel/"))
+        new-dir (file (str (file dir) "/site/src/" (clean-proj-name *project*)))]
+    (.renameTo old-dir new-dir))
+  (let [files (file-seq (file dir))]
     (doseq [f files]
         (if (.isFile f)
           (let [content (slurp (str f))]
@@ -66,7 +69,7 @@
   (config/assoc-subname ((config/read-config config-path) :database)))
 
 (defn create
-  [_ project-name]
+  [project-name]
   (println project-name "created!")
   (let [clean-name (clean-proj-name project-name)]
     (binding [*home-dir* (-> (System/getProperty "user.home")
@@ -82,11 +85,11 @@
       (.mkdirs (file *project-dir*))
       (println "Copying files to: " *project-dir*)
       (unzip-resource "resource_package.zip" *project-dir*)
-      (tailor-proj)
+      (tailor-proj *project-dir*)
       (println "Done...")
       (println "Running bootstrap")
-      (let [config-path (pathify [*project-dir* "config" "development.clj"])
-            db-config (read-db-config config-path)]
-        (bootstrap/bootstrap db-config)
-        (sql/with-connection db-config (create-default))
-        (println "Congratulations! Your project has been provisioned.")))))
+       (let [config-path (pathify [*project-dir* "config" "development.clj"])
+             db-config (read-db-config config-path)]
+         (bootstrap/bootstrap db-config)
+         (sql/with-connection db-config (create-default))
+         (println "Congratulations! Your project has been provisioned.")))))

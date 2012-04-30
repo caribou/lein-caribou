@@ -1,13 +1,14 @@
-(defproject $project$ "0.1.0"
+(defproject antler/caribou-development "0.1.0"
   :description
-  "caribou: type structure interaction medium"
+  "caribou: test site for development purposes"
 
   :dependencies
-  [[antler/caribou-core "0.4.5"]]
+   [[org.clojure/clojure "1.3.0"]
+    [antler/lein-caribou "1.3.3"]]
 
   :sub
-   ["caribou-api"
-   "caribou-frontend"
-   "caribou-admin"]
+   ["admin"
+    "api"
+    "site"]
 
   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n"])
