@@ -69,7 +69,7 @@
   (config/assoc-subname ((config/read-config config-path) :database)))
 
 (defn create
-  [project-name]
+  [project project-name]
   (println project-name "created!")
   (let [clean-name (clean-proj-name project-name)]
     (binding [*home-dir* (-> (System/getProperty "user.home")
