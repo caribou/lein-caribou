@@ -92,13 +92,16 @@
   [project join?]
   (update-in project [:ring :join?] (fn [_] join?)))
 
+(def caribou-repositories
+  {"clojars" "http://clojars.org/repo" "sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
+
 (defn prepare-server
   [project server-key join?]
   (let [project-name (server-project-name server-key)
         server-project (set-join (project/read project-name) join?)
         project-coordinates (coordinates-for server-project)
         _ (pom/add-classpath (io/file (str (name server-key) "/src")))
-        _ (pom/add-dependencies :coordinates (server-project :dependencies) :repositories {"clojars" "http://clojars.org/repo"})
+        _ (pom/add-dependencies :coordinates (server-project :dependencies) :repositories caribou-repositories)
         server-info (start-server server-project)]
     (dosync
      (alter caribou-servers assoc server-key server-info))))
