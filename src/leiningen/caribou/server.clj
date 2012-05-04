@@ -93,7 +93,8 @@
   (update-in project [:ring :join?] (fn [_] join?)))
 
 (def caribou-repositories
-  {"clojars" "http://clojars.org/repo" "sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
+  {"clojars" "http://clojars.org/repo"
+   "sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
 
 (defn prepare-server
   [project server-key join?]
