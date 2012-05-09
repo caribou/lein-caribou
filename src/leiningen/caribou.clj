@@ -5,7 +5,10 @@
   (:use [leiningen.help :only (help-for subtask-help-for)]
         leiningen.caribou.create
         leiningen.caribou.bootstrap
-        leiningen.caribou.server))
+        leiningen.caribou.server
+        leiningen.caribou.war
+        leiningen.caribou.uberwar))
+      
 
 ;; ^{:no-project-needed true} 
 (defn caribou
@@ -22,4 +25,6 @@
          "bootstrap" (apply bootstrap subtask-args)
          "start" (apply start subtask-args)
          "stop" (apply stop subtask-args)
+         "war" (apply war subtask-args)
+         "uberwar" (apply uberwar subtask-args)
          (println "No command by that name")))))
