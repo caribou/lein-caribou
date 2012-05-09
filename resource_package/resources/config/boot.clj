@@ -26,7 +26,7 @@
 
 (defn get-config
   []
-  (merge-with submerge default-config (read-config "config/development.clj")))
+  (merge-with submerge default-config (read-config (clojure.java.io.resource "config/development.clj"))))
 
 ;; This call is required by Caribou
 (configure (get-config))

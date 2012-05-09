@@ -88,7 +88,7 @@
       (tailor-proj *project-dir*)
       (println "Done...")
       (println "Running bootstrap")
-       (let [config-path (pathify [*project-dir* "config" "development.clj"])
+       (let [config-path (pathify [*project-dir* "resources" "config" "development.clj"])
              db-config (read-db-config config-path)]
          (bootstrap/bootstrap db-config)
          (sql/with-connection db-config (create-default))

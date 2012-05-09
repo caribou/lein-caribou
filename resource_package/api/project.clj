@@ -3,6 +3,7 @@
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [antler/caribou-api "0.3.7"]]
   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n"]
+  :resource-paths ["resources/" "../resources/"]            
   :ring {:handler caribou.api.core/app
          :servlet-name "caribou-development-api"
          :init caribou.api.core/init
