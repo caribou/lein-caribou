@@ -59,8 +59,8 @@
     (.renameTo old-dir new-dir))
   (let [files (file-seq (file dir))]
     (doseq [f files]
-        (if (.isFile f)
-          (let [content (slurp (str f))]
+      (if (.isFile f)
+        (let [content (slurp (str f))]
           (println (str f))
           (spit (file (pathify [(str f)])) (substitute-strings content)))))))
 

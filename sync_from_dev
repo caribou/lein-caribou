@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+DEVROOT='../caribou-development'
+
+mkdir -p package/resources
+cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/site $DEVROOT/app $DEVROOT/caribou.keystore $DEVROOT/project.clj package
+cp -R $DEVROOT/config package/resources
+
+for CONFIGFILE in boot development production test
+do
+    sed -i '' 's/caribou_development/$safeproject$_development/g' package/resources/config/$CONFIGFILE.clj
+    sed -i '' 's/skel.controllers/$project$.controllers/g' package/resources/config/$CONFIGFILE.clj
+done
+
+sed -i '' 's/caribou-devsite/$project$-site/g' package/site/project.clj
+sed -i '' 's/skel.core/$project$.core/g' package/site/project.clj
+sed -i '' 's/caribou-development-frontend/$project$-frontend/g' package/site/project.clj
+
+sed -i '' 's/my-test/$project$/g' package/site/resources/templates/home.ftl
+sed -i '' 's/skel.controllers/$project$.controllers/g' package/site/src/skel/controllers/home.clj
+sed -i '' 's/skel.core/$project$.core/g' package/site/src/skel/core.clj
+
+zip -r resources/resource_package.zip package
+rm -rf package
