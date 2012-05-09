@@ -64,10 +64,6 @@
           (println (str f))
           (spit (file (pathify [(str f)])) (substitute-strings content)))))))
 
-(defn read-db-config
-  [config-path]
-  (config/assoc-subname ((config/read-config config-path) :database)))
-
 (defn create
   [project project-name]
   (println project-name "created!")
@@ -86,10 +82,13 @@
       (println "Copying files to: " *project-dir*)
       (unzip-resource "resource_package.zip" *project-dir*)
       (tailor-proj *project-dir*)
+
       (println "Done...")
       (println "Running bootstrap")
-       (let [config-path (pathify [*project-dir* "resources" "config" "development.clj"])
-             db-config (read-db-config config-path)]
-         (bootstrap/bootstrap db-config)
-         (sql/with-connection db-config (create-default))
-         (println "Congratulations! Your project has been provisioned.")))))
+      (let [config-path (pathify [*project-dir* "resources" "config" "development.clj"])
+            app-config (config/read-config config-path)
+            db-config (config/assoc-subname (app-config :database))]
+        (config/configure app-config)
+        (bootstrap/bootstrap db-config)
+        (sql/with-connection db-config (create-default))
+        (println "Congratulations! Your project has been provisioned.")))))
