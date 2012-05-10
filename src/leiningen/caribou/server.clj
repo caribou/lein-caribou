@@ -1,5 +1,6 @@
 (ns leiningen.caribou.server
   (:require [leiningen.core.project :as project]
+            [leiningen.core.eval :as eval]
             [cemerick.pomegranate :as pom]
             [clojure.java.io :as io]
             [ring.adapter.jetty :as ring]))
@@ -46,23 +47,26 @@
     (find-var sym)))
 
 ;; (defn start-server
-;;   [project subdir]
+;;   [project]
 ;;   (eval/eval-in-project
-;;    (assoc project :eval-in :leiningen)
-;;    (let [config (project :ring)
-;;          ssl-config (if (config :ssl-port) default-ssl-config {})
-;;          jetty-config (merge default-jetty-config ssl-config)
-;;          handler (find-var (-> project :ring :handler))
-;;          init (find-var (-> project :ring :init))
-;;          destroy (try (find-var (-> project :ring :destroy)) (catch Exception e nil))]
-;;      (init)
-;;      (let [server (ring/run-jetty handler (merge jetty-config config))
-;;            server-info (struct server-map server handler init destroy)]
-;;        server-info))
+;;    project
+;;    ;; (assoc project :eval-in :leiningen)
+;;    ;; (let [config (project :ring)
+;;    ;;       ssl-config (if (config :ssl-port) default-ssl-config {})
+;;    ;;       jetty-config (merge default-jetty-config ssl-config)]
+;;          ;; handler (find-var (-> project :ring :handler))
+;;          ;; init (find-var (-> project :ring :init))
+;;          ;;destroy (try (find-var (-> project :ring :destroy)) (catch Exception e nil))]
+;;      ;; (init)
+;;      ;; (let [server (ring/run-jetty handler (merge jetty-config config))
+;;      ;;       server-info (struct server-map server handler init destroy)]
+;;      ;;   server-info))
 ;;    (load-namespaces
 ;;     (-> project :ring :handler)
 ;;     (-> project :ring :init)
-;;     (-> project :ring :destroy))))
+;;     )))
+
+;; ;;    (-> project :ring :destroy))))
   
 (defn start-server
   [project]

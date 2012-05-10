@@ -6,7 +6,8 @@
 (defn bootstrap
   [_ config-file]
   (let [config (config/read-config config-file)
-        database (debug (config/assoc-subname (config :database)))]
+        database (config/assoc-subname (config :database))]
+    (config/configure config)
     (bootstrap/bootstrap database)))
 
 ;; (defn bootstrap-all
