@@ -3,8 +3,8 @@
 DEVROOT='../caribou-development'
 
 mkdir -p package/resources
-cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/site $DEVROOT/app $DEVROOT/caribou.keystore $DEVROOT/project.clj package
-cp -R $DEVROOT/config package/resources
+cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
+cp -R $DEVROOT/resources/ package/resources
 
 for CONFIGFILE in boot development production test
 do
@@ -20,5 +20,8 @@ sed -i '' 's/my-test/$project$/g' package/site/resources/templates/home.ftl
 sed -i '' 's/skel.controllers/$project$.controllers/g' package/site/src/skel/controllers/home.clj
 sed -i '' 's/skel.core/$project$.core/g' package/site/src/skel/core.clj
 
-zip -r resources/resource_package.zip package
+pushd .
+cd package
+zip -vr ../resources/resource_package.zip *
+popd
 rm -rf package
