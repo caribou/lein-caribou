@@ -111,19 +111,44 @@
     (dosync
      (alter caribou-servers assoc server-key server-info))))
 
+;; (defn start
+;;   ([project] (start project true))
+;;   ([project join?]
+;;      (if (empty? @caribou-servers)
+;;        (do
+;;          (doseq [server-key (butlast server-list)]
+;;            (prepare-server project server-key false))
+;;          (prepare-server project (last server-list) join?))
+;;        (doseq [server (vals @caribou-servers)]
+;;          (.start (server :server))))))
+        
+(defn server-task
+  [project options]
+  (let [project (update-in project [:ring] merge options)]
+    (eval/eval-in-project
+     (update-in project [:dependencies] conj ['ring-server "0.2.2"])
+     `(ring.server.leiningen/serve '~project)
+     (load-namespaces
+      'ring.server.leiningen
+      (-> project :ring :handler)
+      (-> project :ring :init)
+      (-> project :ring :destroy)))))
+
 (defn start
-  ([project] (start project true))
-  ([project join?]
-     (if (empty? @caribou-servers)
-       (do
-         (doseq [server-key (butlast server-list)]
-           (prepare-server project server-key false))
-         (prepare-server project (last server-list) join?))
-       (doseq [server (vals @caribou-servers)]
-         (.start (server :server))))))
+  [project]
+  (doseq [server-key server-list]
+    (let [project-name (server-project-name server-key)
+          join? (= server-key (last server-list))
+          subproject (project/read project-name)]
+      ;; (server-task subproject {:join? join?}))))
+
+      (if (not join?)
+        (.start (Thread. #(server-task subproject {})))
+        (server-task subproject {}))))) ;; {:join? false}))
         
 (defn stop
   [project]
   (doseq [server (vals @caribou-servers)]
     (.stop (server :server))))
+
 

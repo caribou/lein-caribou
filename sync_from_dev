@@ -3,7 +3,7 @@
 DEVROOT='../caribou-development'
 
 mkdir -p package/resources
-cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
+cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
 cp -R $DEVROOT/resources/ package/resources
 
 for CONFIGFILE in boot development production test
