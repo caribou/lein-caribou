@@ -6,6 +6,8 @@
                   :exclusions [org.clojure/clojure
                                clj-stacktrace
                                hiccup]]
+                 [lein-ring "0.7.0"]
+                 [ring/ring-servlet "1.0.1"]
                  [ring/ring-jetty-adapter "1.1.0"]
                  [com.cemerick/pomegranate "0.0.11"]
                  [antler/zippix "0.1.0"]
