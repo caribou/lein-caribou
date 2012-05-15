@@ -2,6 +2,8 @@
 
 DEVROOT='../caribou-development'
 
+rm resources/resource_package.zip
+
 mkdir -p package/resources
 cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
 cp -R $DEVROOT/resources/ package/resources
