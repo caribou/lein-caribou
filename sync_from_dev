@@ -2,9 +2,16 @@
 
 DEVROOT='../caribou-development'
 
+rm resources/resource_package.zip
+
 mkdir -p package/resources
 cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
 cp -R $DEVROOT/resources/ package/resources
+
+for BASEDIR in admin api site
+do
+    rm -rf package/$BASEDIR/target package/$BASEDIR/test
+done
 
 for CONFIGFILE in boot development production test
 do
@@ -24,4 +31,5 @@ pushd .
 cd package
 zip -vr ../resources/resource_package.zip *
 popd
+
 rm -rf package
