@@ -50,7 +50,7 @@
 (defn create-default
   []
   (model/invoke-models)
-  (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.ftl"}))
+  (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.html"}))
 
 (defn tailor-proj
   [dir]
