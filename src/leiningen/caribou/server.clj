@@ -34,6 +34,12 @@
       (-> project :ring :init)
       (-> project :ring :destroy)))))
 
+(defn start-server
+  [server-key]
+  (let [project-name (server-project-name server-key)
+        subproject (project/read project-name)]
+    (server-task subproject {:open-browser? false :join false})))
+
 (defn start
   [project]
   (doseq [server-key server-list]
