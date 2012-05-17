@@ -21,7 +21,10 @@ done
 
 sed -i '' 's/caribou-devsite/$project$-site/g' package/site/project.clj
 sed -i '' 's/skel.core/$project$.core/g' package/site/project.clj
+
 sed -i '' 's/caribou-development-frontend/$project$-frontend/g' package/site/project.clj
+sed -i '' 's/caribou-development-admin/$project$-admin/g' package/admin/project.clj
+sed -i '' 's/caribou-development-api/$project$-api/g' package/api/project.clj
 
 sed -i '' 's/my-test/$project$/g' package/site/resources/templates/home.html
 sed -i '' 's/skel.controllers/$project$.controllers/g' package/site/src/skel/controllers/home.clj
