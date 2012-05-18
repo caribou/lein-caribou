@@ -13,7 +13,7 @@ do
     rm -rf package/$BASEDIR/target package/$BASEDIR/test
 done
 
-for CONFIGFILE in boot development production test
+for CONFIGFILE in boot production staging development test
 do
     sed -i '' 's/caribou_development/$safeproject$_development/g' package/resources/config/$CONFIGFILE.clj
     sed -i '' 's/skel.controllers/$project$.controllers/g' package/resources/config/$CONFIGFILE.clj
