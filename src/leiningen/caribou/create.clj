@@ -87,8 +87,9 @@
       (println "Running bootstrap")
       (let [config-path (pathify [*project-dir* "resources" "config" "development.clj"])
             app-config (config/read-config config-path)
-            db-config (config/assoc-subname (app-config :database))]
-        (config/configure app-config)
+            _ (config/configure app-config)
+            db-config (config/assoc-subname (assoc (app-config :database) :db-path (str "/" *project-dir* "/")))]
+        (println db-config)
         (bootstrap/bootstrap db-config)
         (sql/with-connection db-config (create-default))
         (println "Congratulations! Your project has been provisioned.")))))
