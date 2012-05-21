@@ -3,6 +3,7 @@ pom.xml
 /lib/
 /classes/
 /phong-ho/
+/target
 .lein-failures
 .lein-deps-sum
 .classpath
