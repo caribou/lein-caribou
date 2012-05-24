@@ -13,8 +13,8 @@
 ;; ^{:no-project-needed true} 
 (defn caribou
   "Creates new caribou projects"
-  {:help-arglists '([create bootstrap start stop])
-   :subtasks [#'create #'bootstrap #'start #'stop]
+  {:help-arglists '([create bootstrap start stop uberwar uberwar-all])
+   :subtasks [#'create #'bootstrap #'start #'stop #'uberwar #'uberwar-all]
    :no-project-needed true}
   ([project]
      (println (help-for "caribou")))
@@ -25,6 +25,6 @@
          "bootstrap" (apply bootstrap subtask-args)
          "start" (apply start subtask-args)
          "stop" (apply stop subtask-args)
-         "war" (apply war subtask-args)
          "uberwar" (apply uberwar subtask-args)
+         "uberwar-all" (apply uberwar-all subtask-args)
          (println "No command by that name")))))

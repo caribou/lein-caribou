@@ -2,8 +2,16 @@
   (:require [leiningen.caribou.war :as war]
             [leiningen.ring.war :as ring-war]
             [leiningen.ring.uberwar :as ring-uberwar]
+            [leiningen.core.project :as project]            
             [leiningen.compile :as compile]
             [clojure.java.io :as io]))
+
+(def subproject-list
+  [:site :api :admin])
+  
+(defn subproject-name
+  [project-key]
+  (str (name project-key) "/project.clj"))
 
 (defn write-uberwar [project war-path]
   (with-open [war-stream (ring-war/create-war project war-path)]
@@ -20,15 +28,25 @@
 (defn uberwar
   "Create a $PROJECT-$VERSION.war with dependencies."
   ([project]
-     (uberwar project (ring-uberwar/default-uberwar-name project)))
-  ([project war-name]
-     (let [res (compile/compile project)]
+     (let [res (compile/compile project)
+           war-name (ring-uberwar/default-uberwar-name project)]
        (when-not (and (number? res) (pos? res))
-         (let [war-path (ring-war/war-file-path project war-name)]
+         (let [war-path (war/war-file-path project war-name)]
            (ring-war/compile-servlet project)
            (if (ring-war/has-listener? project)
              (ring-war/compile-listener project))
            (write-uberwar project war-path)
            (println "Created" war-path)
-           war-path)))))
+           war-name)))))
+
+(defn uberwar-all
+  "Build $PROJECT-$VERSION.war for all subprojects"
+  [project]
+  (doseq [project-key subproject-list]
+    (let [project-name (subproject-name project-key)
+          subproject (project/read project-name)
+          war-name (uberwar subproject)]
+      (io/copy (io/file (str (:target-path subproject) "/" war-name))
+               (io/file (str (:target-path project) "/" war-name)))
+        )))
 

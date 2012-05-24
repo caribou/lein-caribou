@@ -25,6 +25,11 @@
     (let [war-path (ring-war/in-war-path war-root dir-path file)]
       (file-entry war project war-path file))))
 
+(defn war-file-path [project war-name]
+  (let [target-dir (or (:target-dir project) (:target-path project))]
+    (.mkdirs (io/file target-dir))
+    (str target-dir "/" war-name)))
+
 (defn write-war [project war-path]
   (with-open [war-stream (ring-war/create-war project war-path)]
     (doto war-stream
@@ -44,7 +49,7 @@
   ([project war-name]
      (let [res (compile/compile project)]
        (when-not (and (number? res) (pos? res))
-         (let [war-path (ring-war/war-file-path project war-name)]
+         (let [war-path (war-file-path project war-name)]
            (ring-war/compile-servlet project)
            (if (ring-war/has-listener? project)
              (ring-war/compile-listener project))
