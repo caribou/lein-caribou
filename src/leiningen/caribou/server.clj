@@ -15,6 +15,11 @@
              (symbol ns)
              s))))
 
+(defn full-head-avoidance
+  [jetty]
+  (doseq [connector (.getConnectors jetty)]
+    (.setRequestHeaderSize connector 8388608)))
+
 (def server-list
   [:site :api :admin])
   
@@ -26,7 +31,7 @@
   [project options]
   (let [project (update-in project [:ring] merge options)]
     (eval/eval-in-project
-     (update-in project [:dependencies] concat [['ring-server "0.2.2"]])
+     (update-in project [:dependencies] concat [['antler/ring-server "0.2.3"]])
      `(ring.server.leiningen/serve '~project)
      (load-namespaces
       'ring.server.leiningen
