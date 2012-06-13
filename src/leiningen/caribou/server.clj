@@ -20,8 +20,8 @@
   (doseq [connector (.getConnectors jetty)]
     (.setRequestHeaderSize connector 8388608)))
 
-(def server-list
-  [:site :api :admin])
+;; (def server-list
+;;   [:site :api :admin])
   
 (defn server-project-name
   [server-key]
@@ -47,13 +47,14 @@
 
 (defn start
   [project]
-  (doseq [server-key server-list]
-    (let [project-name (server-project-name server-key)
-          join? (= server-key (last server-list))
-          subproject (project/read project-name)]
-      (if (not join?)
-        (.start (Thread. #(server-task subproject {:open-browser? false})))
-        (server-task subproject {:open-browser? false})))))
+  (let [server-list (map keyword (:sub project))]
+    (doseq [server-key server-list]
+      (let [project-name (server-project-name server-key)
+            join? (= server-key (last server-list))
+            subproject (project/read project-name)]
+        (if (not join?)
+          (.start (Thread. #(server-task subproject {:open-browser? false})))
+          (server-task subproject {:open-browser? false}))))))
         
 (defn stop
   [project])
