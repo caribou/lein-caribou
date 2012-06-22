@@ -17,7 +17,3 @@
                      [lein-clojars "0.6.0"]]
   :eval-in-leiningen true
   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n"])
-  ;; :repositories {"snapshots" {:url "http://battlecat:8080/nexus/content/repositories/snapshots" 
-  ;;                             :username "deployment" :password "deployment"}
-  ;;                "releases"  {:url "http://battlecat:8080/nexus/content/repositories/releases" 
-  ;;                             :username "deployment" :password "deployment"}})
