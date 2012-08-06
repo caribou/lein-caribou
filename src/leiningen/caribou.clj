@@ -7,7 +7,8 @@
         leiningen.caribou.bootstrap
         leiningen.caribou.server
         leiningen.caribou.war
-        leiningen.caribou.uberwar))
+        leiningen.caribou.uberwar
+        leinengen.caribou.versions))
       
 
 ;; ^{:no-project-needed true} 
@@ -27,4 +28,5 @@
          "stop" (apply stop subtask-args)
          "uberwar" (apply uberwar subtask-args)
          "uberwar-all" (apply uberwar-all subtask-args)
+         "versions" (apply versions subtask-args)
          (println "No command by that name")))))
