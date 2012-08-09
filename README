@@ -7,7 +7,7 @@ lein-caribou is a leiningen plugin to create and manage caribou projects.
 Install lein-caribou alongside lein-ring in your ~/.lein/profiles.clj:
 
     [lein-ring "0.6.4"]
-    [antler/lein-caribou "1.4.7"]
+    [antler/lein-caribou "1.4.8"]
 
 Then from the command line:
 

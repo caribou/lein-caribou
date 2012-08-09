@@ -8,7 +8,7 @@
         leiningen.caribou.server
         leiningen.caribou.war
         leiningen.caribou.uberwar
-        leinengen.caribou.versions))
+        leiningen.caribou.versions))
       
 
 ;; ^{:no-project-needed true} 
