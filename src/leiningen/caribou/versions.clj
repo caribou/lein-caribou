@@ -1,7 +1,9 @@
 (ns leiningen.caribou.versions
   (:require [leiningen.core.project :as project]
             [clojure.string :as string]
+            [clojure.xml :as xml]
             [clojure.data.json :as json]))
+
 
 (defn- dbg
   [& args]
@@ -38,8 +40,7 @@
        admin (current-version f 'antler/caribou-admin)
        api (current-version f 'antler/caribou-api)
        frontend (current-version f 'antler/caribou-frontend)]
-;   (println "f is " f)
-   (doall (filter #(and (% 0) (% 1))
+   (doall (filter #(% 1)
                   [[core-v core "core"]
                    [admin-v admin "admin"]
                    [api-v api "api"]
@@ -79,14 +80,58 @@
             version-string (string/join "." greatest)]
         version-string))))
 
+(defn local-greatest
+  [name]
+  (let [env (java.lang.System/getenv)
+        home (get env "HOME")
+        m2-home (get env "M2_HOME")
+        m2-config (and m2-home (xml/parse
+                                (str m2-home "/settings.xml")))
+        setting (and m2-config
+                     (first (:content
+                             (first (filter #(= (:tag %) :localRepository)
+                                            (:content m2-config))))))
+        root-dir (or (and setting
+                          (string/replace setting
+                                          #"\$\{.*\}"
+                                          #(case % "${user.home}" home
+                                                 "${env.HOME}" m2-home
+                                                 ;; $ is magic here
+                                                 (clojure.string/escape
+                                                  % {\$ "\\$"}))))
+                     (str home "/.m2"))
+        repo [root-dir "/repository/"]
+        ns-spec (string/split name #"[/.]")
+        path (concat repo ns-spec)
+        greatest-version (fn [dir]
+                           (let [subs (.listFiles dir)
+                                 dirs (filter #(.isDirectory %) subs)
+                                 strs (map #(.getName %) dirs)
+                                 parsed (map parse-version strs)
+                                 sorted (sort compare-versions parsed)]
+                             (first sorted)))]                             
+    (loop [p path pathstr "/"]
+      (let [f (java.io.File. pathstr)]
+        (if (.exists f)
+          (if (empty? p)
+            (string/join "." (greatest-version f))
+            (recur (rest p) (str pathstr "/" (first p))))
+          (throw (Error. (str "invalid path for m2 repository: " pathstr))))))))
+        
+
 (defn versions
   [& args]
-  (let [arg (last args)
-        path (if (string? arg) arg ".")
-        core-v (get-version "caribou-core")
-        admin-v (get-version "caribou-admin")
-        api-v (get-version "caribou-api")
-        frontend-v (get-version "caribou-frontend")
+  (let [command-line (rest args)
+        path (or (and command-line (first command-line))
+                 ".")
+        core-v [(local-greatest "antler/caribou-core")
+                (get-version "caribou-core")]
+        admin-v [(local-greatest "antler/caribou-admin")
+                 (get-version "caribou-admin")]
+        api-v [(local-greatest "antler/caribou-api")
+               (get-version "caribou-api")]
+        frontend-v [(local-greatest "antler/caribou-frontend")
+                    (get-version "caribou-frontend")]
         check-deps (partial deps core-v admin-v api-v frontend-v)
         base-file (str path "/project.clj")
         base (check-deps base-file)
@@ -102,4 +147,8 @@
       (if (empty? (check 1))
         (println "no monitored dependencies to report")
         (doseq [v (check 1)]
-          (println (v 2) " is at " (v 1) " upstream is " (v 0)))))))
+          (println (v 2) "is at" (v 1) "upstream is" ((v 0) 1)
+                   (if ((v 0) 0)
+                     (str "local highest is " ((v 0) 0))
+                     "")))))))
+
