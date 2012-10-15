@@ -4,7 +4,7 @@
             [leiningen.ring.war :as ring-war]
             [clojure.java.io :as io]
             [clojure.string :as string])
-  (:use [leiningen.ring.server :only (eval-in-project)]
+  (:use ;; [leiningen.ring.server :only (eval-in-project)]
         [clojure.data.xml :only [sexp-as-element indent-str]])
   (:import [java.util.jar Manifest
                           JarEntry

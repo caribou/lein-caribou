@@ -1,8 +1,8 @@
-(defproject antler/lein-caribou "1.4.11"
+(defproject antler/lein-caribou "1.5.0"
   :description "Caribou Provisioning Tool"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [leiningen-core "2.0.0-preview3"]
-                 [ring "1.1.0"
+                 [ring "1.1.6"
                   :exclusions [org.clojure/clojure
                                clj-stacktrace
                                hiccup]]
@@ -12,7 +12,7 @@
                  [com.cemerick/pomegranate "0.0.11"]
                  [antler/zippix "0.1.0"]
                  [antler/commons-io "2.2.0"]
-                 [antler/caribou-core "0.6.12"]]
+                 [antler/caribou-core "0.7.2"]]
   :dev-dependencies [[lein-eclipse "1.0.0"]
                      [lein-clojars "0.6.0"]]
   :eval-in-leiningen true
