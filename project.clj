@@ -1,4 +1,4 @@
-(defproject antler/lein-caribou "1.5.0"
+(defproject antler/lein-caribou "1.5.1"
   :description "Caribou Provisioning Tool"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [leiningen-core "2.0.0-preview3"]
