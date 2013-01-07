@@ -71,7 +71,7 @@
   (let [url (str "https://clojars.org/search?q="
                  name "&format=json")
         json-string (slurp url)
-        json-obj (json/read-json json-string true)
+        json-obj (json/read json-string true)
         versions (map :version (:results json-obj))]
     (if-let [versions (filter identity versions)]
       (let [sortable-versions (map parse-version versions)
