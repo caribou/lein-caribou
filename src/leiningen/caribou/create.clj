@@ -93,7 +93,6 @@
 
       (println "Running bootstrap")
       (let [new-project (project/read (pathify [*project-dir* "project.clj"]))]
-        ;;(pprint/pprint new-project)
         (migrate/migrate new-project (pathify [*project-dir* "resources" "config" "development.clj"])))
       (println "Congratulations! Your project has been provisioned.")
       )))
