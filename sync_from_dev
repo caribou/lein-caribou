@@ -5,7 +5,7 @@ DEVROOT='../caribou-development'
 rm resources/resource_package.zip
 
 mkdir -p package/resources
-rsync -av --safe-links --exclude $DEVROOT/bump.sh --exclude $DEVROOT/admin/target --exclude $DEVROOT/api/target --exclude $DEVROOT/site/target $DEVROOT/.gitignore $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
+rsync -av --safe-links --exclude $DEVROOT/bump.sh --exclude $DEVROOT/admin/target --exclude $DEVROOT/api/target --exclude $DEVROOT/site/target $DEVROOT/.gitignore $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/src $DEVROOT/caribou.keystore $DEVROOT/project.clj package
 rsync -av --safe-links $DEVROOT/resources/ package/resources
 # cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
 # cp -R $DEVROOT/resources/ package/resources
