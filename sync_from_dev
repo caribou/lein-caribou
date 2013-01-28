@@ -19,6 +19,7 @@ for CONFIGFILE in boot production staging development test
 do
     sed -i '' 's/caribou_/$safeproject$_/g' package/resources/config/$CONFIGFILE.clj
     sed -i '' 's/skel.controllers/$project$.controllers/g' package/resources/config/$CONFIGFILE.clj
+    sed -i '' 's/skel.hooks/$project$.hooks/g' package/resources/config/$CONFIGFILE.clj
 done
 
 sed -i '' 's/caribou-devsite/$project$-site/g' package/site/project.clj
