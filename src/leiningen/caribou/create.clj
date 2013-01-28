@@ -6,7 +6,10 @@
             [caribou.db :as db]
             [caribou.config :as config]
             [caribou.tasks.bootstrap :as bootstrap]
-            [clojure.java.jdbc :as sql])
+            [clojure.java.jdbc :as sql]
+            [clojure.pprint :as pprint]
+            [leiningen.caribou.migrate :as migrate]
+            [leiningen.core.project :as project])
   (:use clojure.java.io
         [zippix.core :only (pathify unzip-resource)]))
 
@@ -47,16 +50,20 @@
     (assoc @config/db :database (str project-name "_development"))
     :subname)))
 
-(defn create-default
-  []
-  (model/invoke-models)
-  (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.html"}))
+;; TODO:kd - this should be a migration:
+; (defn create-default
+;   []
+;   (model/invoke-models)
+;   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.html"}))
 
 (defn tailor-proj
   [dir]
   (let [old-dir (file (str (file dir) "/site/src/skel/"))
-        new-dir (file (str (file dir) "/site/src/" (clean-proj-name *project*)))]
-    (.renameTo old-dir new-dir))
+        new-dir (file (str (file dir) "/site/src/" (clean-proj-name *project*)))
+        old-src-dir (file (str (file dir) "/src/skel"))
+        new-src-dir (file (str (file dir) "/src/" (clean-proj-name *project*)))]
+    (.renameTo old-dir new-dir)
+    (.renameTo old-src-dir new-src-dir))
   (let [files (file-seq (file dir))]
     (doseq [f files]
       (if (.isFile f)
@@ -66,7 +73,7 @@
 
 (defn create
   [project project-name]
-  (println project-name "created!")
+  ;;(println project-name "created!")
   (let [clean-name (clean-proj-name project-name)]
     (binding [*home-dir* (-> (System/getProperty "user.home")
                            (file ".caribou")
@@ -82,14 +89,10 @@
       (println "Copying files to: " *project-dir*)
       (unzip-resource "resource_package.zip" *project-dir*)
       (tailor-proj *project-dir*)
-
       (println "Done...")
+
       (println "Running bootstrap")
-      (let [config-path (pathify [*project-dir* "resources" "config" "development.clj"])
-            app-config (config/read-config config-path)
-            _ (config/configure app-config)
-            db-config (config/assoc-subname (assoc (app-config :database) :db-path (str "/" *project-dir* "/")))]
-        (println db-config)
-        (bootstrap/bootstrap db-config)
-        (sql/with-connection db-config (create-default))
-        (println "Congratulations! Your project has been provisioned.")))))
+      (let [new-project (project/read (pathify [*project-dir* "project.clj"]))]
+        (migrate/migrate new-project (pathify [*project-dir* "resources" "config" "development.clj"])))
+      (println "Congratulations! Your project has been provisioned.")
+      )))
