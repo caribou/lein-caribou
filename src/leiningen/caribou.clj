@@ -23,7 +23,6 @@
      (let [subtask-args (cons project args)]
        (condp = subtask
          "create" (apply create subtask-args)
-         ;"bootstrap" (apply bootstrap subtask-args)
          "migrate" (apply migrate subtask-args)
          "rollback" (apply rollback subtask-args)
          "start" (apply start subtask-args)

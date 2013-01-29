@@ -22,6 +22,9 @@ do
     sed -i '' 's/skel.hooks/$project$.hooks/g' package/resources/config/$CONFIGFILE.clj
 done
 
+sed -i '' 's/antler\/caribou-development/$project$/g' package/project.clj
+sed -i '' 's/skel.migrations/$project$.migrations/g' package/project.clj
+
 sed -i '' 's/caribou-devsite/$project$-site/g' package/site/project.clj
 sed -i '' 's/skel.core/$project$.core/g' package/site/project.clj
 

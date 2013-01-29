@@ -5,7 +5,6 @@
             [caribou.model :as model]
             [caribou.db :as db]
             [caribou.config :as config]
-            [caribou.tasks.bootstrap :as bootstrap]
             [clojure.java.jdbc :as sql]
             [clojure.pprint :as pprint]
             [leiningen.caribou.migrate :as migrate]
@@ -43,18 +42,25 @@
   (.mkdirs (file *home-dir* "config"))
   (spit (apply file *home-dir* ["config" "database.yml"]) (get-template "database_caribou.yml")))
 
-(defn find-db-config
-  [project-name]
-  (config/assoc-subname
-   (dissoc
-    (assoc @config/db :database (str project-name "_development"))
-    :subname)))
+; Is this used anywhere? -kd
+; (defn find-db-config
+;   [project-name]
+;   (config/assoc-subname
+;    (dissoc
+;     (assoc @config/db :database (str project-name "_development"))
+;     :subname)))
 
-;; TODO:kd - this should be a migration:
-; (defn create-default
-;   []
-;   (model/invoke-models)
-;   (model/create :page {:name "Home" :path "" :controller "home" :action "home" :template "home.html"}))
+;; This is a hack to get around the JVM nonsense of not being able to change the current
+;; working directory.  When lein caribou create is first run, the cwd is . as expected,
+;; but when it bootstraps the DB using the "migrate" code, this causes a problem
+;; for any h2 database, which writes itself into the current directory.
+; (defn relocate-bootstrapped-database
+;   [new-project project-dir]
+;   ;; TODO:kd - don't hardcode the DB name here, derive from bootstrapped config file.
+;   (let [bogus-db-file-name (str (clean-proj-name (:name new-project)) "_development.h2.db")
+;         bogus-db-file      (file bogus-db-file-name)
+;         target-db-file     (file (pathify [(:name new-project) bogus-db-file-name]))]
+;     (.renameTo bogus-db-file target-db-file)))
 
 (defn tailor-proj
   [dir]
@@ -93,6 +99,8 @@
 
       (println "Running bootstrap")
       (let [new-project (project/read (pathify [*project-dir* "project.clj"]))]
-        (migrate/migrate new-project (pathify [*project-dir* "resources" "config" "development.clj"])))
+        (migrate/migrate new-project (pathify [*project-dir* "resources" "config" "development.clj"]))
+        ;(relocate-bootstrapped-database new-project *project-dir*)
+        )
       (println "Congratulations! Your project has been provisioned.")
       )))
