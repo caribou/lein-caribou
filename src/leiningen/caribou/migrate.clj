@@ -7,17 +7,23 @@
 (defn migrate
   [prj config-file & migrations]
   (println "-> Running migrations on" config-file)
-  (eval/eval-in-project prj
-    `(caribou.migration/run-migrations '~prj '~config-file true '~@migrations)
-    (load-namespaces
-      'caribou.migration
-    ))
+  (if (not (nil? prj))
+    (eval/eval-in-project prj
+      `(caribou.migration/run-migrations '~prj '~config-file true '~@migrations)
+      (load-namespaces
+        'caribou.migration
+      ))
+    (apply caribou.migration/run-migrations (concat [prj config-file true] migrations)))
   (println "<- Migrations finished."))
 
 (defn rollback
   [prj config-file & rollbacks]
-  (eval/eval-in-project prj
-    `(caribou.migration/run-rollbacks '~prj '~config-file true '~@rollbacks)
-    (load-namespaces
-      'caribou.migration
-    )))
+  (if (not (nil? prj))
+    (eval/eval-in-project prj
+      `(caribou.migration/run-rollbacks '~prj '~config-file true '~@rollbacks)
+      (load-namespaces
+        'caribou.migration
+      ))
+    (apply caribou.migration/run-rollbacks (concat [prj config-file true] rollbacks)))
+  (println "<- Rollbacks finished."))
+
