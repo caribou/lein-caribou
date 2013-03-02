@@ -1,4 +1,4 @@
-(defproject antler/lein-caribou "1.6.7"
+(defproject antler/lein-caribou "1.7.0"
   :description "Caribou Provisioning Tool"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [leiningen-core "2.0.0-preview3"]
@@ -12,8 +12,6 @@
                  [com.cemerick/pomegranate "0.0.11"]
                  [antler/zippix "0.1.0"]
                  [antler/commons-io "2.2.0"]
-                 [antler/caribou-core "0.8.0"]]
-  :dev-dependencies [[lein-eclipse "1.0.0"]
-                     [lein-clojars "0.6.0"]]
+                 [antler/caribou-core "0.8.8"]]
   :eval-in-leiningen true
   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n"])
