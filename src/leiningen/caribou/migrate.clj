@@ -1,5 +1,5 @@
 (ns leiningen.caribou.migrate
-  (:use caribou.debug [leiningen.caribou.server :only (load-namespaces)])
+  (:use [leiningen.caribou.server :only (load-namespaces)])
   (:require [leiningen.core.eval :as eval]
             [caribou.config :as config]
             [caribou.migration :as migration]))

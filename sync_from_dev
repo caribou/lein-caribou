@@ -20,6 +20,7 @@ do
     sed -i '' 's/caribou_/$safeproject$_/g' package/resources/config/$CONFIGFILE.clj
     sed -i '' 's/skel.controllers/$project$.controllers/g' package/resources/config/$CONFIGFILE.clj
     sed -i '' 's/skel.hooks/$project$.hooks/g' package/resources/config/$CONFIGFILE.clj
+sed -i '' 's/skel.fields/$project$.fields/g' package/site/resources/config/$CONFIGFILE.clj
 done
 
 sed -i '' 's/skel.hooks.model/$project$.hooks.model/g' package/src/skel/hooks/model.clj
