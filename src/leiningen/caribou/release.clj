@@ -64,7 +64,8 @@
   {'antler/caribou-core ['antler/caribou-frontend
                          'antler/caribou-api
                          'antler/lein-caribou]
-   'antler/caribou-frontend ['antler/caribou-development]
+   'antler/caribou-frontend ['antler/caribou-development
+                             'antler/caribou-admin]
    'antler/caribou-api ['antler/caribou-development]
    'antler/caribou-admin ['antler/caribou-development]
    'antler/caribou-development []
@@ -100,6 +101,9 @@
 (defn git-commit-tag-push
   [])
 
+(defn push-to-clojars
+  [])
+
 (defn release-project
   [project-name version]
   (let [project-path (build-project-path project-name)
@@ -110,4 +114,4 @@
     (swap! version-increments assoc project-symbol version)
     (propagate-dependencies project-symbol version)
     (git-commit-tag-push)
-    (clojars push)))
+    (push-to-clojars)))
