@@ -5,10 +5,8 @@ DEVROOT='../caribou-development'
 rm resources/resource_package.zip
 
 mkdir -p package/resources
-rsync -av --safe-links --exclude $DEVROOT/bump.sh --exclude $DEVROOT/admin/target --exclude $DEVROOT/api/target --exclude $DEVROOT/site/target $DEVROOT/.gitignore $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/src $DEVROOT/caribou.keystore $DEVROOT/project.clj package
+rsync -av --safe-links --exclude $DEVROOT/target $DEVROOT/.gitignore $DEVROOT/app $DEVROOT/src $DEVROOT/project.clj package
 rsync -av --safe-links $DEVROOT/resources/ package/resources
-# cp -R $DEVROOT/admin $DEVROOT/api $DEVROOT/app $DEVROOT/site $DEVROOT/caribou.keystore $DEVROOT/project.clj package
-# cp -R $DEVROOT/resources/ package/resources
 
 for BASEDIR in admin api site
 do
@@ -25,19 +23,14 @@ done
 
 sed -i '' 's/skel.hooks.model/$project$.hooks.model/g' package/src/skel/hooks/model.clj
 
-sed -i '' 's/antler\/caribou-development/$project$/g' package/project.clj
+sed -i '' 's/caribou-devsite/$project$-site/g' package/project.clj
+sed -i '' 's/skel.core/$project$.core/g' package/project.clj
 sed -i '' 's/skel.migrations/$project$.migrations/g' package/project.clj
+sed -i '' 's/caribou-development-frontend/$project$-frontend/g' package/project.clj
 
-sed -i '' 's/caribou-devsite/$project$-site/g' package/site/project.clj
-sed -i '' 's/skel.core/$project$.core/g' package/site/project.clj
-
-sed -i '' 's/caribou-development-frontend/$project$-frontend/g' package/site/project.clj
-sed -i '' 's/caribou-development-admin/$project$-admin/g' package/admin/project.clj
-sed -i '' 's/caribou-development-api/$project$-api/g' package/api/project.clj
-
-sed -i '' 's/my-test/$project$/g' package/site/resources/templates/home.html
-sed -i '' 's/skel.controllers/$project$.controllers/g' package/site/src/skel/controllers/home.clj
-sed -i '' 's/skel.core/$project$.core/g' package/site/src/skel/core.clj
+sed -i '' 's/my-test/$project$/g' package/resources/templates/home.html
+sed -i '' 's/skel.controllers/$project$.controllers/g' package/src/skel/controllers/home.clj
+sed -i '' 's/skel.core/$project$.core/g' package/src/skel/core.clj
 
 pushd .
 cd package
