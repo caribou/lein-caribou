@@ -14,7 +14,7 @@
 
 (declare ^:dynamic *project* ^:dynamic *project-dir* ^:dynamic *dirs* ^:dynamic *home-dir*)
 
-(defn clean-proj-name
+(defn clean-project-name
   [n]
   (string/replace n #"-" "_"))
 
@@ -26,7 +26,7 @@
   []
   [[#"\$project\$" *project*]
    [#"\$project-dir\$" *project-dir*]
-   [#"\$safeproject\$" (clean-proj-name *project*)]])
+   [#"\$safeproject\$" (clean-project-name *project*)]])
 
 (defn substitute-strings
   [tmpl]
@@ -57,19 +57,24 @@
 ; (defn relocate-bootstrapped-database
 ;   [new-project project-dir]
 ;   ;; TODO:kd - don't hardcode the DB name here, derive from bootstrapped config file.
-;   (let [bogus-db-file-name (str (clean-proj-name (:name new-project)) "_development.h2.db")
+;   (let [bogus-db-file-name (str (clean-project-name (:name new-project)) "_development.h2.db")
 ;         bogus-db-file      (file bogus-db-file-name)
 ;         target-db-file     (file (pathify [(:name new-project) bogus-db-file-name]))]
 ;     (.renameTo bogus-db-file target-db-file)))
 
+(defn evolve-name
+  [dir path before after]
+  (let [old (file (str dir path before))
+        new (file (str dir path after))]
+    (.renameTo old new)))
+
 (defn tailor-proj
   [dir]
-  (let [old-dir (file (str (file dir) "/site/src/skel/"))
-        new-dir (file (str (file dir) "/site/src/" (clean-proj-name *project*)))
-        old-src-dir (file (str (file dir) "/src/skel"))
-        new-src-dir (file (str (file dir) "/src/" (clean-proj-name *project*)))]
-    (.renameTo old-dir new-dir)
-    (.renameTo old-src-dir new-src-dir))
+  (let [clean-project (clean-project-name *project*)
+        dir-str (str (file dir))]
+    (evolve-name dir-str "/src/" "skel" clean-project)
+    (evolve-name dir-str "/resources/public/css/" "skel.css" (str clean-project ".css"))
+    (evolve-name dir-str "/resources/public/js/" "skel.js" (str clean-project ".js")))
   (let [files (file-seq (file dir))]
     (doseq [f files]
       (if (.isFile f)
@@ -80,7 +85,7 @@
 (defn create
   [project project-name]
   ;;(println project-name "created!")
-  (let [clean-name (clean-proj-name project-name)]
+  (let [clean-name (clean-project-name project-name)]
     (binding [*home-dir* (-> (System/getProperty "user.home")
                            (file ".caribou")
                            (.getAbsolutePath))

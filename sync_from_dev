@@ -22,15 +22,19 @@ do
 done
 
 sed -i '' 's/skel.hooks.model/$project$.hooks.model/g' package/src/skel/hooks/model.clj
+sed -i '' 's/skel.migrations.default/$project$.migrations.default/g' package/src/skel/migrations/default.clj
+sed -i '' 's/skel.migrations.order/$project$.migrations.order/g' package/src/skel/migrations/order.clj
+sed -i '' 's/skel.controllers/$project$.controllers/g' package/src/skel/controllers/home.clj
+sed -i '' 's/skel.core/$project$.core/g' package/src/immutant/init.clj
+sed -i '' 's/skel.core/$project$.core/g' package/src/skel/core.clj
 
-sed -i '' 's/caribou-devsite/$project$-site/g' package/project.clj
+sed -i '' 's/caribou-devsite/$project$/g' package/project.clj
 sed -i '' 's/skel.core/$project$.core/g' package/project.clj
 sed -i '' 's/skel.migrations/$project$.migrations/g' package/project.clj
 sed -i '' 's/caribou-development-frontend/$project$-frontend/g' package/project.clj
 
 sed -i '' 's/my-test/$project$/g' package/resources/templates/home.html
-sed -i '' 's/skel.controllers/$project$.controllers/g' package/src/skel/controllers/home.clj
-sed -i '' 's/skel.core/$project$.core/g' package/src/skel/core.clj
+sed -i '' 's/skel/$project$/g' package/resources/templates/home.html
 
 pushd .
 cd package
