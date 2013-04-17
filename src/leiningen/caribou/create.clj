@@ -73,8 +73,8 @@
   (let [clean-project (clean-project-name *project*)
         dir-str (str (file dir))]
     (evolve-name dir-str "/src/" "skel" clean-project)
-    (evolve-name dir-str "/resources/public/css/" "skel.css" (str clean-project ".css"))
-    (evolve-name dir-str "/resources/public/js/" "skel.js" (str clean-project ".js")))
+    (evolve-name dir-str "/resources/public/css/" "skel.css" (str *project* ".css"))
+    (evolve-name dir-str "/resources/public/js/" "skel.js" (str *project* ".js")))
   (let [files (file-seq (file dir))]
     (doseq [f files]
       (if (.isFile f)
