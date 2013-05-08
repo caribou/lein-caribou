@@ -27,6 +27,8 @@ sed -i '' 's/skel.migrations.order/$project$.migrations.order/g' package/src/ske
 sed -i '' 's/skel.migrations.admin/$project$.migrations.admin/g' package/src/skel/migrations/admin.clj
 sed -i '' 's/skel.controllers/$project$.controllers/g' package/src/skel/controllers/home.clj
 sed -i '' 's/skel.core/$project$.core/g' package/src/immutant/init.clj
+sed -i '' 's/skel.boot/$project$.boot/g' package/src/skel/boot.clj
+sed -i '' 's/skel.boot/$project$.boot/g' package/src/skel/core.clj
 sed -i '' 's/skel.core/$project$.core/g' package/src/skel/core.clj
 
 sed -i '' 's/caribou-devsite/$project$/g' package/project.clj
