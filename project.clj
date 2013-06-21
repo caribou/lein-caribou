@@ -12,6 +12,6 @@
                  [com.cemerick/pomegranate "0.0.11"]
                  [antler/zippix "0.1.0"]
                  [antler/commons-io "2.2.0"]
-                 [antler/caribou-core "0.11.0"]]
+                 [antler/caribou-core "0.11.22"]]
   :eval-in-leiningen true
   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n"])

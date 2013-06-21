@@ -23,8 +23,11 @@
         values (dissoc project :name :version)
         cat (mapcat identity (seq values))
         output (concat (list 'defproject project-name version) cat)
-        raw (with-out-str (pprint/pprint output))]
-    (println path raw)))
+        raw (with-out-str 
+              (binding [pprint/*print-miser-width* 200] 
+                (pprint/pprint output)))]
+    (println path) 
+    (println raw)))
     ;; (spit path raw)))
 
 (defn increment-version-number
@@ -62,14 +65,14 @@
 
 (def dependency-tree
   {'antler/caribou-core ['antler/caribou-frontend
-                         'antler/caribou-api
                          'antler/lein-caribou]
-   'antler/caribou-frontend ['antler/caribou-development
-                             'antler/caribou-admin]
+   'antler/caribou-frontend ['antler/caribou-api
+                             'antler/caribou-admin
+                             'antler/caribou-development]
    'antler/caribou-api ['antler/caribou-development]
    'antler/caribou-admin ['antler/caribou-development]
    'antler/caribou-development []
-   'antler/stencil ['antler/caribou-frontend]
+   'antler/antlers ['antler/caribou-frontend]
    'antler/lein-caribou []})
 
 (defn build-project-path
@@ -115,3 +118,10 @@
     (propagate-dependencies project-symbol version)
     (git-commit-tag-push)
     (push-to-clojars)))
+
+(defn release
+  ([project]
+     (println "PROJECT" project)
+     (release project (increment-version-number (:version project))))
+  ([project version]
+     (release-project (:name project) version)))
