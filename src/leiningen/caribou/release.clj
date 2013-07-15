@@ -16,6 +16,15 @@
       :name project-name
       :version version)))
 
+(defn pprint
+  "Pretty-print a representation of the project map."
+  [project & keys]
+  (if (seq keys)
+    (doseq [k keys]
+      (pprint/pprint (project (read-string k))))
+    (pprint/pprint project))
+  (flush))
+
 (defn write-project
   [project path]
   (let [project-name (:name project)
@@ -23,10 +32,13 @@
         values (dissoc project :name :version)
         cat (mapcat identity (seq values))
         output (concat (list 'defproject project-name version) cat)
-        raw (with-out-str 
-              (binding [pprint/*print-miser-width* 200] 
-                (pprint/pprint output)))]
-    (println path) 
+        raw (pprint output)]
+        ;; raw (with-out-str 
+        ;;       (pprint/pprint output))]
+        ;; raw (with-out-str 
+        ;;       (binding [pprint/*print-right-margin* 300] 
+        ;;         (pprint/pprint output)))]
+    (println path)
     (println raw)))
     ;; (spit path raw)))
 
