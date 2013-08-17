@@ -8,11 +8,6 @@ mkdir -p package/resources
 rsync -av --safe-links --exclude $DEVROOT/target $DEVROOT/.gitignore $DEVROOT/app $DEVROOT/src $DEVROOT/project.clj package
 rsync -av --safe-links $DEVROOT/resources/ package/resources
 
-for BASEDIR in admin api site
-do
-    rm -rf package/$BASEDIR/target package/$BASEDIR/test
-done
-
 for CONFIGFILE in boot production staging development test
 do
     sed -i '' 's/caribou_/$safeproject$_/g' package/resources/config/$CONFIGFILE.clj
