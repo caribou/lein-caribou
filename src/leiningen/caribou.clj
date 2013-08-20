@@ -5,14 +5,12 @@
         leiningen.caribou.create
         leiningen.caribou.migrate
         leiningen.caribou.server
-        leiningen.caribou.war
-        leiningen.caribou.uberwar
         leiningen.caribou.versions))
       
 (defn caribou
   "Creates new caribou projects"
-  {:help-arglists '([catapult create migrate rollback start stop uberwar uberwar-all release])
-   :subtasks [#'catapult #'create #'migrate #'rollback #'start #'stop #'uberwar #'uberwar-all #'release]
+  {:help-arglists '([catapult create migrate rollback start stop release])
+   :subtasks [#'catapult #'create #'migrate #'rollback #'start #'stop #'release]
    :no-project-needed true}
   ([project]
      (println (help-for "caribou")))
@@ -26,7 +24,5 @@
          "rollback" (apply rollback subtask-args)
          "start" (apply start subtask-args)
          "stop" (apply stop subtask-args)
-         "uberwar" (apply uberwar subtask-args)
-         "uberwar-all" (apply uberwar-all subtask-args)
          "versions" (apply versions subtask-args)
          (println "No command by that name")))))
