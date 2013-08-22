@@ -73,6 +73,7 @@
   (let [clean-project (clean-project-name *project*)
         dir-str (str (file dir))]
     (evolve-name dir-str "/src/" "skel" clean-project)
+    (evolve-name dir-str "/resources/cljs/" "skel.cljs" (str *project* ".cljs"))
     (evolve-name dir-str "/resources/public/css/" "skel.css" (str *project* ".css"))
     (evolve-name dir-str "/resources/public/js/" "skel.js" (str *project* ".js")))
   (let [files (file-seq (file dir))]
