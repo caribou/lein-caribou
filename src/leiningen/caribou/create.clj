@@ -95,8 +95,6 @@
                               (file project-name)
                               (.getAbsolutePath))]
       (println "Creating caribou project:" *project*)
-      (if (not= true (.isDirectory (file *home-dir*)))
-        (create-config))
       (.mkdirs (file *project-dir*))
       (println "Copying files to: " *project-dir*)
       (unzip-resource "resource_package.zip" *project-dir*)
@@ -106,7 +104,6 @@
       (println "Running bootstrap")
       (let [new-project (project/read (pathify [*project-dir* "project.clj"]))]
         (migrate/migrate new-project (pathify [*project-dir* "resources" "config" "development.clj"]))
-        ;(relocate-bootstrapped-database new-project *project-dir*)
         )
       (println "Congratulations! Your project has been provisioned.")
       )))
