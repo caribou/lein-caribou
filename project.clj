@@ -1,6 +1,7 @@
 (defproject antler/lein-caribou "2.4.4"
   :description "Caribou Provisioning Tool"
   :dependencies [[org.clojure/clojure "1.4.0"]
+                 [org.clojure/java.jdbc "0.2.3"]
                  [leiningen-core "2.0.0"]
                  [ring "1.2.0"
                   :exclusions [org.clojure/clojure
