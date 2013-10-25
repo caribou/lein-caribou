@@ -3,11 +3,13 @@
             [leiningen.caribou.server :as server]))
 
 (defn catapult
-  [prj dir bucket prefix]
-  (println "Catapulting" dir "to the" bucket "s3 bucket under" prefix)
+  [prj dir config-file]
+  (println "Catapulting" dir "to s3")
   (eval/eval-in-project
    prj
-   `(do
-      (caribou.config/init)
-      (caribou.asset/migrate-dir-to-s3 '~dir '~bucket '~prefix))
-   (server/load-namespaces 'caribou.config 'caribou.asset)))
+   `(let [config# (caribou.config/read-config '~config-file)
+          config# (caribou.config/process-config config#)
+          config# (caribou.core/init config#)]
+      (caribou.core/with-caribou config#
+        (caribou.asset/migrate-dir-to-s3 '~dir)))
+   (server/load-namespaces 'caribou.config 'caribou.core 'caribou.asset)))
