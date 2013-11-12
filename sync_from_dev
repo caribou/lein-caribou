@@ -7,7 +7,7 @@ rm resources/resource_package.zip
 
 mkdir -p package/resources
 rsync -av --safe-links --exclude target $DEVROOT/.gitignore $DEVROOT/app $DEVROOT/src $DEVROOT/project.clj $TEMPLATE_ROOT
-rsync -av --safe-links --exclude public/js/out $DEVROOT/resources/ $TEMPLATE_ROOT/resources
+rsync -av --safe-links --exclude public/js/app $DEVROOT/resources/ $TEMPLATE_ROOT/resources
 
 for CONFIGFILE in production staging development test
 do
