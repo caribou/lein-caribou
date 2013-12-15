@@ -7,28 +7,30 @@
 
 (defn migrate
   [prj & args]
-  (let [[config migrations] (retrieve-config-and-args prj args)]
+  (let [[[namespace callback] migrations] (retrieve-config-and-args prj args)]
     (println "-> Running migrations on config")
     (if (not (nil? prj))
       (eval/eval-in-project prj
-                            `(caribou.migration/run-migrations '~prj '~config true '~@migrations)
+                            `(caribou.migration/run-migrations '~prj (~callback) true '~@migrations)
                             (load-namespaces
-                             'caribou.migration
+                              'caribou.migration
+                              namespace
                              ))
-      (apply caribou.migration/run-migrations (concat [prj config true] migrations))))
+      (apply caribou.migration/run-migrations (concat [prj (callback) true] migrations))))
   (println "<- Migrations finished."))
 
 (defn rollback
   [prj & args]
-  (let [[config rollbacks] (retrieve-config-and-args prj args)]
+  (let [[[namespace callback] rollbacks] (retrieve-config-and-args prj args)]
     (println "-> Running rollback on config")
     (if (not (nil? prj))
       (eval/eval-in-project prj
-                            `(caribou.migration/run-rollbacks '~prj '~config true '~@rollbacks)
+                            `(caribou.migration/run-rollbacks '~prj (~callback) true '~@rollbacks)
                             (load-namespaces
-                             'caribou.migration
+                              'caribou.migration
+                              namespace
                              ))
-      (apply caribou.migration/run-rollbacks (concat [prj config true] rollbacks))))
+      (apply caribou.migration/run-rollbacks (concat [prj (callback) true] rollbacks))))
   (println "<- Rollbacks finished."))
 
 

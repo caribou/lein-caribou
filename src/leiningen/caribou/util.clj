@@ -14,22 +14,22 @@
              s))))
 
 (defn read-static-config [config-file]
-  (-> config-file
-      config/read-config
-      config/process-config))
+  ['caribou.config #(-> config-file
+                        config/read-config
+                        config/process-config)])
 
 (defn load-boot
   [prj boot-location]
-  (print (let [namespace (symbol (first (string/split boot-location #"/")))
-         boot-fn (symbol boot-location)]
-     (eval/eval-in-project prj
-                           `(~boot-fn)
-                           `(require '~namespace)))))
+  (let [namespace (symbol (first (string/split boot-location #"/")))
+        boot-fn (symbol boot-location)]
+    [namespace boot-fn]))
 
 (defn retrieve-config-and-args
   "Chooses a config loading fn based upon the :static or :boot option
-   and retuns a config map as the first element and the rest of the
-   args as the second"
+   and retuns a vector where the first element is a vector with the required
+   namespaces in the first position and the config loading function in the
+   second. The second element of the top level vector is the rest of the args
+   passed in."
   [prj args]
   (condp = (first args)
     ":static" [(read-static-config (second args))
