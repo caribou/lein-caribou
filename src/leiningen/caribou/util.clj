@@ -14,9 +14,9 @@
              s))))
 
 (defn read-static-config [config-file]
-  ['caribou.config #(-> config-file
-                        config/read-config
-                        config/process-config)])
+  ['caribou.config `#(-> ~config-file
+                         caribou.config/read-config
+                         caribou.config/process-config)])
 
 (defn load-boot
   [prj boot-location]
