@@ -1,19 +1,10 @@
 (ns leiningen.caribou.server
-  (:require [leiningen.core.project :as project]
+  (:require [leiningen.caribou.util :as util]
+            [leiningen.core.project :as project]
             [leiningen.core.eval :as eval]
             [cemerick.pomegranate :as pom]
             [clojure.java.io :as io]
             [ring.adapter.jetty :as ring]))
-
-(defn load-namespaces
-  "Create require forms for each of the supplied symbols. This exists because
-  Clojure cannot load and use a new namespace in the same eval form."
-  [& syms]
-  `(require
-    ~@(for [s syms :when s]
-        `'~(if-let [ns (namespace s)]
-             (symbol ns)
-             s))))
 
 (defn full-head-avoidance
   [jetty]
@@ -33,7 +24,7 @@
     (eval/eval-in-project
      (update-in project [:dependencies] concat [['antler/ring-server "0.2.3"]])
      `(ring.server.leiningen/serve '~project)
-     (load-namespaces
+     (util/load-namespaces
       'ring.server.leiningen
       (-> project :ring :handler)
       (-> project :ring :init)
